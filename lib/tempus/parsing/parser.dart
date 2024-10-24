@@ -12,6 +12,7 @@ import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
+import 'package:prototype/tempus/syntax_node.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
 class Parser {
@@ -68,9 +69,19 @@ class Parser {
     }
 
     CompilationUnitSyntax parseCompilationUnit() {
-      ExpressionSyntax expression = _parseExpression();
+      List<ExpressionSyntax> lines = [];
+
+      int i = 0;
+      while (_peek(1).kind != SyntaxKind.eofToken && i++ != 15) {
+        if (_current.kind == SyntaxKind.eolToken) {
+          _nextToken();
+          continue;
+        }
+        lines += [_parseExpression()];
+      }
+
       SyntaxToken eofToken = _match([SyntaxKind.eofToken]);
-      return CompilationUnitSyntax(expression, eofToken);
+      return CompilationUnitSyntax(lines, eofToken);
     }
 
     // StatementSyntax _parseStatement() {

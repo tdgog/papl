@@ -2,6 +2,7 @@ enum SyntaxKind {
   // Tokens
   badToken,
   eofToken,
+  eolToken,
   whitespaceToken,
   integerToken,
   floatToken,

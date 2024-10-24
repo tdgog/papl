@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final myController = TextEditingController();
+  final myController = TextEditingController(text: "int a = 5; \na + 150;");
   String output = "";
 
   @override
@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               onPressed: () {
                 setState(() {
-                  output = interpretString(myController.text.split("\n")).map((e) => "$e\n").join();
+                  output = interpretString(myController.text).join('\n');
                 });
               },
               child: const Text('Run'),

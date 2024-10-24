@@ -5,13 +5,13 @@ import 'package:prototype/tempus/syntax_token.dart';
 
 class CompilationUnitSyntax extends SyntaxNode {
 
-  final ExpressionSyntax expression;
+  final List<ExpressionSyntax> lines;
   final SyntaxToken eofToken;
 
-  CompilationUnitSyntax(this.expression, this.eofToken);
+  CompilationUnitSyntax(this.lines, this.eofToken);
 
   @override
-  Iterable<SyntaxNode> get children => [expression, eofToken];
+  Iterable<SyntaxNode> get children => [...lines, eofToken];
 
   @override
   SyntaxKind get kind => SyntaxKind.compilationUnit;

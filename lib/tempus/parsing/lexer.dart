@@ -48,6 +48,8 @@ class Lexer {
     }
 
     switch (_currentCharacter) {
+      case ';':
+        return SyntaxToken(SyntaxKind.eolToken, _position++, ';');
       case '+':
         return SyntaxToken(SyntaxKind.plusToken, _position++, '+');
       case '-':
