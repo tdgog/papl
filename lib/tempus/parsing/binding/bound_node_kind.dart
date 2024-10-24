@@ -2,6 +2,6 @@ enum BoundNodeKind {
   literalExpression,
   binaryExpression,
   unaryExpression,
-  assignmentExpression,
+  assignmentStatement,
   variableExpression
 }

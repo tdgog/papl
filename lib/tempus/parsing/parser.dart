@@ -83,6 +83,17 @@ class Parser {
     }
 
     StatementSyntax _parseStatement() {
+      if (_current.kind == SyntaxKind.identifierToken
+          && _peek(1).kind == SyntaxKind.identifierToken
+          && _peek(2).kind == SyntaxKind.equalsToken) {
+        return DefinitionStatementSyntax(_nextToken(), _nextToken(), _nextToken(), _parseExpression());
+      }
+
+      if (_current.kind == SyntaxKind.identifierToken
+          && _peek(1).kind == SyntaxKind.equalsToken) {
+        return AssignmentStatementSyntax(_nextToken(), _nextToken(), _parseExpression());
+      }
+
       return _parseExpressionStatement();
     }
 
@@ -91,28 +102,6 @@ class Parser {
     }
 
     ExpressionSyntax _parseExpression() {
-      return _parseAssignmentExpression();
-    }
-
-    ExpressionSyntax _parseAssignmentExpression() {
-      if (_current.kind == SyntaxKind.identifierToken
-          && _peek(1).kind == SyntaxKind.identifierToken
-          && _peek(2).kind == SyntaxKind.equalsToken) {
-        SyntaxToken type = _nextToken();
-        SyntaxToken identifier = _nextToken();
-        SyntaxToken operator = _nextToken();
-        ExpressionSyntax right = _parseAssignmentExpression();
-        return DefinitionExpressionSyntax(type, identifier, operator, right);
-      }
-
-      if (_current.kind == SyntaxKind.identifierToken
-          && _peek(1).kind == SyntaxKind.equalsToken) {
-        SyntaxToken identifier = _nextToken();
-        SyntaxToken operator = _nextToken();
-        ExpressionSyntax right = _parseAssignmentExpression();
-        return AssignmentExpressionSyntax(identifier, operator, right);
-      }
-
       return _parseBinaryExpression();
     }
 

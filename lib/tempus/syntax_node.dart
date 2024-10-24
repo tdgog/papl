@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:prototype/tempus/parsing/codeanalysis/ansi_colors.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_token.dart';
@@ -62,8 +60,8 @@ abstract class SyntaxNode {
       case SyntaxKind.bracketExpression:
       case SyntaxKind.literalExpression:
       case SyntaxKind.nameExpression:
-      case SyntaxKind.definitionExpression:
-      case SyntaxKind.assignmentExpression:
+      case SyntaxKind.definitionStatement:
+      case SyntaxKind.assignmentStatement:
           return AnsiColors.MAGENTA;
 
       default:

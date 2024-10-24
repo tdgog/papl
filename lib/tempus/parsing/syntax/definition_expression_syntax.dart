@@ -1,21 +1,22 @@
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_node.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
-class DefinitionExpressionSyntax extends ExpressionSyntax {
+class DefinitionStatementSyntax extends StatementSyntax {
 
   final SyntaxToken type;
   final SyntaxToken identifier;
   final SyntaxToken equalsToken;
   final ExpressionSyntax expression;
 
-  DefinitionExpressionSyntax(this.type, this.identifier, this.equalsToken, this.expression);
+  DefinitionStatementSyntax(this.type, this.identifier, this.equalsToken, this.expression);
 
   @override
   Iterable<SyntaxNode>? get children => [identifier, equalsToken, expression];
 
   @override
-  SyntaxKind get kind => SyntaxKind.definitionExpression;
+  SyntaxKind get kind => SyntaxKind.definitionStatement;
 
 }

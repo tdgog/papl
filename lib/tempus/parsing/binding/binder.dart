@@ -30,10 +30,12 @@ final class Binder {
 
   BoundStatement bindStatement(StatementSyntax syntax) {
     switch (syntax.kind) {
-      case SyntaxKind.expressionStatement:
-        return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
+      case SyntaxKind.definitionStatement:
+        return _bindDefinitionStatement(syntax as DefinitionStatementSyntax);
+      case SyntaxKind.assignmentStatement:
+        return _bindAssignmentStatement(syntax as AssignmentStatementSyntax);
       default:
-        throw Exception('Unexpected syntax ${syntax.kind}');
+        return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
     }
   }
 
@@ -53,10 +55,6 @@ final class Binder {
         return _bindBracketExpression(syntax as BracketExpressionSyntax);
       case SyntaxKind.nameExpression:
         return _bindNameExpression(syntax as NameExpressionSyntax);
-      case SyntaxKind.definitionExpression:
-        return _bindDefinitionExpression(syntax as DefinitionExpressionSyntax);
-      case SyntaxKind.assignmentExpression:
-        return _bindAssignmentExpression(syntax as AssignmentExpressionSyntax);
       default:
         throw Exception('Unexpected syntax ${syntax.kind}');
     }
@@ -114,7 +112,7 @@ final class Binder {
     return BoundVariableExpression(VariableSymbol(name!, type));
   }
   
-  BoundExpression _bindDefinitionExpression(DefinitionExpressionSyntax syntax) {
+  BoundStatement _bindDefinitionStatement(DefinitionStatementSyntax syntax) {
     String? name = syntax.identifier.text;
     Type? type = nameToType(syntax.type.text ?? '');
     BoundExpression expression = _bindExpression(syntax.expression);
@@ -127,10 +125,10 @@ final class Binder {
       throw Exception('Expression type does not match variable type');
     }
 
-    return BoundAssignmentExpression(name, expression);
+    return BoundAssignmentStatement(name, expression);
   }
 
-  BoundExpression _bindAssignmentExpression(AssignmentExpressionSyntax syntax) {
+  BoundStatement _bindAssignmentStatement(AssignmentStatementSyntax syntax) {
     String? name = syntax.identifier.text;
     BoundExpression expression = _bindExpression(syntax.expression);
 
@@ -143,7 +141,7 @@ final class Binder {
       throw Exception('Expression type does not match variable type');
     }
 
-    return BoundAssignmentExpression(name!, expression);
+    return BoundAssignmentStatement(name!, expression);
   }
 
   Type? getType(SyntaxKind kind) {

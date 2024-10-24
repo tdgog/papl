@@ -29,10 +29,10 @@ enum SyntaxKind {
   bracketExpression,
   literalExpression,
   nameExpression,
-  definitionExpression,
-  assignmentExpression,
 
   // Statements
+  definitionStatement,
+  assignmentStatement,
   blockStatement,
   expressionStatement,
 

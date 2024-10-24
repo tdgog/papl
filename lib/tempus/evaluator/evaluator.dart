@@ -46,18 +46,12 @@ class Evaluator {
     return null;
   }
 
-  void _evaluateStatement(BoundStatement node) {
-
-  }
-
   EvaluationResult _evaluateExpression(BoundExpression node) {
     switch (node.kind) {
       case BoundNodeKind.literalExpression:
         return _evaluateLiteralExpression(node as BoundLiteralExpression);
       case BoundNodeKind.variableExpression:
         return _evaluateVariableExpression(node as BoundVariableExpression);
-      case BoundNodeKind.assignmentExpression:
-        return _evaluateAssignmentExpression(node as BoundAssignmentExpression);
       case BoundNodeKind.unaryExpression:
         return _evaluateUnaryExpression(node as BoundUnaryExpression);
       case BoundNodeKind.binaryExpression:
@@ -79,13 +73,6 @@ class Evaluator {
     }
 
     return EvaluationResult(result, expression.variable.type);
-  }
-
-  EvaluationResult _evaluateAssignmentExpression(BoundAssignmentExpression expression) {
-    EvaluationResult value = _evaluateExpression(expression.expression);
-    variables[VariableSymbol(expression.name, expression.type)] = value.result;
-
-    return EvaluationResult(value.result, expression.type);
   }
 
   EvaluationResult _evaluateUnaryExpression(BoundUnaryExpression expression) {
@@ -123,6 +110,20 @@ class Evaluator {
       return visitor.visit(left, right);
     }
     throw Exception('Unexpected binary operator ${expression.operator}');
+  }
+
+  void _evaluateStatement(BoundStatement node) {
+    switch (node.kind) {
+      case BoundNodeKind.assignmentStatement:
+        return _evaluateAssignmentStatement(node as BoundAssignmentStatement);
+      default:
+        throw Exception('Unexpected node ${node.kind}');
+    }
+  }
+
+  void _evaluateAssignmentStatement(BoundAssignmentStatement expression) {
+    EvaluationResult value = _evaluateExpression(expression.expression);
+    variables[VariableSymbol(expression.name, expression.type)] = value.result;
   }
 
 }

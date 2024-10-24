@@ -1,6 +1,7 @@
 import 'package:prototype/tempus/evaluator/evaluator.dart';
 import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
+import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
@@ -22,10 +23,13 @@ List<String> interpretString(String code) {
 
   for (StatementSyntax expression in tree.root.lines) {
     Binder binder = Binder(variables);
-    BoundStatement boundExpression = binder.bindStatement(expression);
-    Evaluator evaluator = Evaluator(boundExpression, variables);
+    BoundStatement boundStatement = binder.bindStatement(expression);
+    Evaluator evaluator = Evaluator(boundStatement, variables);
     var result = evaluator.evaluate();
-    output.add("$result");
+
+    if (boundStatement is BoundExpressionStatement) {
+      output.add("$result");
+    }
   }
 
   return output;
