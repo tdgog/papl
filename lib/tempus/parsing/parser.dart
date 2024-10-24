@@ -1,6 +1,5 @@
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
-import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/compilation_unit_syntax.dart';
 import 'package:prototype/tempus/parsing/lexer.dart';
@@ -12,7 +11,6 @@ import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
-import 'package:prototype/tempus/syntax_node.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
 class Parser {
@@ -69,7 +67,7 @@ class Parser {
     }
 
     CompilationUnitSyntax parseCompilationUnit() {
-      List<ExpressionSyntax> lines = [];
+      List<StatementSyntax> lines = [];
 
       int i = 0;
       while (_peek(1).kind != SyntaxKind.eofToken && i++ != 15) {
@@ -77,35 +75,20 @@ class Parser {
           _nextToken();
           continue;
         }
-        lines += [_parseExpression()];
+        lines += [_parseStatement()];
       }
 
       SyntaxToken eofToken = _match([SyntaxKind.eofToken]);
       return CompilationUnitSyntax(lines, eofToken);
     }
 
-    // StatementSyntax _parseStatement() {
-    //   if (_current.kind == SyntaxKind.openBraceToken) {
-    //     return _parseBlockStatement();
-    //   }
-    //   return _parseExpressionStatement();
-    // }
-    //
-    // StatementSyntax _parseBlockStatement() {
-    //   List<StatementSyntax> statements = [];
-    //   SyntaxToken openBraceToken = _match([SyntaxKind.openBraceToken]);
-    //
-    //   while (_current.kind != SyntaxKind.eofToken && _current.kind != SyntaxKind.closeBraceToken) {
-    //     statements.add(_parseStatement());
-    //   }
-    //
-    //   SyntaxToken closeBraceToken = _match([SyntaxKind.closeBraceToken]);
-    //   return BlockStatementSyntax(openBraceToken, statements, closeBraceToken);
-    // }
-    //
-    // StatementSyntax _parseExpressionStatement() {
-    //   return ExpressionStatementSyntax(_parseExpression());
-    // }
+    StatementSyntax _parseStatement() {
+      return _parseExpressionStatement();
+    }
+
+    StatementSyntax _parseExpressionStatement() {
+      return ExpressionStatementSyntax(_parseExpression());
+    }
 
     ExpressionSyntax _parseExpression() {
       return _parseAssignmentExpression();

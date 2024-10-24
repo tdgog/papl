@@ -11,8 +11,10 @@ import 'package:prototype/tempus/parsing/binding/bound_assignment_expression.dar
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
+import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_node_kind.dart';
+import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_variable_expression.dart';
@@ -31,13 +33,21 @@ final Map<BoundBinaryOperatorKind, Visitor> binaryOperatorVisitors = {
 
 class Evaluator {
 
-  final BoundExpression root;
+  final BoundStatement root;
   final VariableCollection variables;
 
   Evaluator(this.root, this.variables);
 
-  Object evaluate() {
-    return _evaluateExpression(root).result;
+  Object? evaluate() {
+    if (root is BoundExpressionStatement) {
+      return _evaluateExpression((root as BoundExpressionStatement).expression).result;
+    }
+    _evaluateStatement(root);
+    return null;
+  }
+
+  void _evaluateStatement(BoundStatement node) {
+
   }
 
   EvaluationResult _evaluateExpression(BoundExpression node) {

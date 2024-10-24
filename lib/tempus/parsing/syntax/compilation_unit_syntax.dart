@@ -1,11 +1,11 @@
-import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_node.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
 class CompilationUnitSyntax extends SyntaxNode {
 
-  final List<ExpressionSyntax> lines;
+  final List<StatementSyntax> lines;
   final SyntaxToken eofToken;
 
   CompilationUnitSyntax(this.lines, this.eofToken);
