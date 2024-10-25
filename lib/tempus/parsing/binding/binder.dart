@@ -147,7 +147,9 @@ final class Binder {
   Type? getType(SyntaxKind kind) {
     return {
       SyntaxKind.integerToken: int,
-      SyntaxKind.floatToken: double
+      SyntaxKind.floatToken: double,
+      SyntaxKind.trueKeyword: bool,
+      SyntaxKind.falseKeyword: bool
     }[kind];
   }
 

@@ -62,6 +62,7 @@ abstract class SyntaxNode {
       case SyntaxKind.nameExpression:
       case SyntaxKind.definitionStatement:
       case SyntaxKind.assignmentStatement:
+      case SyntaxKind.expressionStatement:
           return AnsiColors.MAGENTA;
 
       default:

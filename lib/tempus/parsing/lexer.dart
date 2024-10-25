@@ -135,9 +135,9 @@ class Lexer {
     String value = _text.substring(start, _position);
     switch (value) {
       case "true":
-        return SyntaxToken(SyntaxKind.trueKeyword, start, value, true);
+        return SyntaxToken(SyntaxKind.trueKeyword, start, 'true', true);
       case "false":
-        return SyntaxToken(SyntaxKind.falseKeyword, start, value, false);
+        return SyntaxToken(SyntaxKind.falseKeyword, start, 'false', false);
       default:
         return SyntaxToken(SyntaxKind.identifierToken, start, value, value);
     }
