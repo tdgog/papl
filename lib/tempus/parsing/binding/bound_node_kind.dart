@@ -4,5 +4,6 @@ enum BoundNodeKind {
   unaryExpression,
   assignmentStatement,
   variableExpression,
-  forLoop
+  forLoop,
+  block
 }

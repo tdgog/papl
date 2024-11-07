@@ -1,8 +1,10 @@
-import 'package:prototype/tempus/parsing/binding/bound_assignment_expression.dart';
+import 'package:prototype/tempus/parsing/binding/BoundBlock.dart';
+import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
+import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
@@ -10,6 +12,7 @@ import 'package:prototype/tempus/parsing/binding/bound_unary_operator.dart';
 import 'package:prototype/tempus/parsing/binding/bound_variable_expression.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
+import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
@@ -22,6 +25,7 @@ import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
+import 'package:prototype/tempus/syntax_node.dart';
 
 final class Binder {
 
@@ -35,6 +39,8 @@ final class Binder {
         return _bindDefinitionStatement(syntax as DefinitionStatementSyntax);
       case SyntaxKind.assignmentStatement:
         return _bindAssignmentStatement(syntax as AssignmentStatementSyntax);
+      case SyntaxKind.blockStatement:
+        return _bindBlock(syntax as BlockStatementSyntax);
       case SyntaxKind.forLoop:
         return _bindForLoop(syntax as ForLoopSyntax);
       default:
@@ -147,9 +153,24 @@ final class Binder {
     return BoundAssignmentStatement(name!, expression);
   }
 
+  BoundStatement _bindBlock(BlockStatementSyntax syntax) {
+    List<BoundStatement> statements = [];
+    for (SyntaxNode node in syntax.children!) {
+      if (node is StatementSyntax) {
+        statements.add(bindStatement(node));
+      }
+    }
+
+    return BoundBlock(statements);
+  }
+
   BoundStatement _bindForLoop(ForLoopSyntax syntax) {
-    /* Todo: bind for loop into BoundForLoop & add support into the evaluator
-             it probably just needs the before, end, between, and block statements */
+    BoundStatement preLoopStatement = bindStatement(syntax.preLoopStatement);
+    BoundExpression startIterationCheck = _bindExpression(syntax.startLoopCheck);
+    BoundStatement afterIterationStatement = bindStatement(syntax.afterIterationStatement);
+    BoundStatement loopBlock = bindStatement(syntax.loopBlock);
+
+    return BoundForLoop(preLoopStatement, startIterationCheck, afterIterationStatement, loopBlock);
   }
 
   Type? getType(SyntaxKind kind) {

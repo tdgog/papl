@@ -8,4 +8,8 @@ enum BoundBinaryOperatorKind {
   modulo,
   equals,
   notEquals,
+  lessThan,
+  greaterThan,
+  lessThanOrEqualTo,
+  greaterThanOrEqualTo,
 }

@@ -108,5 +108,11 @@ final List<_TypeBindings> _bindings = [
     SyntaxKind.bangEqualsToken: BoundBinaryOperatorKind.notEquals,
     SyntaxKind.doubleAmpersandToken: BoundBinaryOperatorKind.logicalAnd,
     SyntaxKind.doublePipeToken: BoundBinaryOperatorKind.logicalOr,
+  }),
+  _TypeBindings.allUndefinedPermutations([int, double], bool, {
+    SyntaxKind.lessThanToken: BoundBinaryOperatorKind.lessThan,
+    SyntaxKind.greaterThanToken: BoundBinaryOperatorKind.greaterThan,
+    SyntaxKind.lessThanOrEqualToToken: BoundBinaryOperatorKind.lessThanOrEqualTo,
+    SyntaxKind.greaterThanOrEqualToToken: BoundBinaryOperatorKind.greaterThanOrEqualTo,
   })
 ];

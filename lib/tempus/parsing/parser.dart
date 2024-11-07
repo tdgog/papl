@@ -113,13 +113,13 @@ class Parser {
       SyntaxToken openBracketToken = _nextToken();
       StatementSyntax preLoopStatement = _parseStatement();
       _nextToken(); // Consume semicolon after statement
-      ExpressionSyntax endLoopCheck = _parseExpression();
+      ExpressionSyntax startLoopCheck = _parseExpression();
       _nextToken(); // Consume semicolon after statement
       StatementSyntax afterIterationStatement = _parseStatement();
       SyntaxToken closeBracketToken = _nextToken();
       StatementSyntax loopBlock = _parseScope();
       return ForLoopSyntax(forKeyword, openBracketToken, preLoopStatement,
-          endLoopCheck, afterIterationStatement, closeBracketToken, loopBlock);
+          startLoopCheck, afterIterationStatement, closeBracketToken, loopBlock);
     }
 
     StatementSyntax _parseScope() {

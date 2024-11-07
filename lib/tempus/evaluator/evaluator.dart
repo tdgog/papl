@@ -1,17 +1,23 @@
 import 'package:prototype/tempus/evaluator/evaluation_result.dart';
 import 'package:prototype/tempus/evaluator/visitors/addition_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/division_visitor.dart';
+import 'package:prototype/tempus/evaluator/visitors/greater_than_or_equal_to_visitor.dart';
+import 'package:prototype/tempus/evaluator/visitors/greater_than_visitor.dart';
+import 'package:prototype/tempus/evaluator/visitors/less_than_or_equal_to_visitor.dart';
+import 'package:prototype/tempus/evaluator/visitors/less_than_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/logical_and_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/logical_or_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/modulo_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/multiplication_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/subtraction_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/visitor.dart';
-import 'package:prototype/tempus/parsing/binding/bound_assignment_expression.dart';
+import 'package:prototype/tempus/parsing/binding/BoundBlock.dart';
+import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
+import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_node_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
@@ -28,7 +34,11 @@ final Map<BoundBinaryOperatorKind, Visitor> binaryOperatorVisitors = {
   BoundBinaryOperatorKind.division: DivisionVisitor(),
   BoundBinaryOperatorKind.modulo: ModuloVisitor(),
   BoundBinaryOperatorKind.logicalAnd: LogicalAndVisitor(),
-  BoundBinaryOperatorKind.logicalOr: LogicalOrVisitor()
+  BoundBinaryOperatorKind.logicalOr: LogicalOrVisitor(),
+  BoundBinaryOperatorKind.lessThan: LessThanVisitor(),
+  BoundBinaryOperatorKind.lessThanOrEqualTo: LessThanOrEqualToVisitor(),
+  BoundBinaryOperatorKind.greaterThan: GreaterThanVisitor(),
+  BoundBinaryOperatorKind.greaterThanOrEqualTo: GreaterThanOrEqualToVisitor(),
 };
 
 class Evaluator {
@@ -109,13 +119,17 @@ class Evaluator {
     if (visitor != null) {
       return visitor.visit(left, right);
     }
-    throw Exception('Unexpected binary operator ${expression.operator}');
+    throw Exception('Unexpected binary operator ${expression.operator.operatorKind}');
   }
 
   void _evaluateStatement(BoundStatement node) {
     switch (node.kind) {
       case BoundNodeKind.assignmentStatement:
         return _evaluateAssignmentStatement(node as BoundAssignmentStatement);
+      case BoundNodeKind.forLoop:
+        return _evaluateForLoop(node as BoundForLoop);
+      case BoundNodeKind.block:
+        return _evaluateBlock(node as BoundBlock);
       default:
         throw Exception('Unexpected node ${node.kind}');
     }
@@ -127,6 +141,24 @@ class Evaluator {
         ?? VariableSymbol(expression.name, expression.type);
 
     variables[symbol] = value.result;
+  }
+
+  void _evaluateForLoop(BoundForLoop expression) {
+    for (
+      _evaluateStatement(expression.preLoopStatement);
+      _evaluateExpression(expression.startIterationCheck).result as bool;
+      _evaluateStatement(expression.afterIterationStatement)
+    ) {
+      _evaluateStatement(expression.loopBlock);
+    }
+  }
+
+  void _evaluateBlock(BoundBlock expression) {
+    VariableCollection blockVariables = VariableCollection.from(variables);
+    for (BoundStatement statement in expression.statements) {
+      Evaluator(statement, blockVariables).evaluate();
+    }
+    variables.updateAll((key, _) => blockVariables[key]!);
   }
 
 }

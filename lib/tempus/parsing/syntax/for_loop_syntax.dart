@@ -9,18 +9,18 @@ class ForLoopSyntax extends StatementSyntax {
   final SyntaxToken forKeyword;
   final SyntaxToken openBracketToken;
   final StatementSyntax preLoopStatement;
-  final ExpressionSyntax endLoopCheck;
+  final ExpressionSyntax startLoopCheck;
   final StatementSyntax afterIterationStatement;
   final SyntaxToken closeBracketToken;
   final StatementSyntax loopBlock;
 
   ForLoopSyntax(this.forKeyword, this.openBracketToken, this.preLoopStatement,
-      this.endLoopCheck, this.afterIterationStatement, this.closeBracketToken,
+      this.startLoopCheck, this.afterIterationStatement, this.closeBracketToken,
       this.loopBlock);
 
   @override
   Iterable<SyntaxNode>? get children =>
-      [forKeyword, openBracketToken, preLoopStatement, endLoopCheck,
+      [forKeyword, openBracketToken, preLoopStatement, startLoopCheck,
       afterIterationStatement, closeBracketToken, loopBlock];
 
   @override
