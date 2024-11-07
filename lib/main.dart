@@ -57,9 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
               maxLines: null,
             ),
             TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              ),
               onPressed: () {
                 setState(() {
                   output = interpretString(myController.text).join('\n');

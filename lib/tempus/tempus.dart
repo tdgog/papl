@@ -58,12 +58,9 @@ List<String> _interpretLines(List<StatementSyntax> lines, {VariableCollection? p
   }
 
   // Promote any existing variables which have been modified at the end of scope execution
-  print("end of scope, previous = $previous");
   if (previous != null) {
     previous.updateAll((key, _) => variables[key]!);
-    previous.printCollection();
   }
-  variables.printCollection();
 
   return output;
 }
