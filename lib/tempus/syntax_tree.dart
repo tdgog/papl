@@ -10,6 +10,7 @@ class SyntaxTree {
   SyntaxTree(this.text) {
     var parser = Parser(text);
     root = parser.parseCompilationUnit();
+    print("Parsed");
   }
 
   void printTree() => SyntaxNode.printTree(root);

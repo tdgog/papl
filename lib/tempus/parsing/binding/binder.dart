@@ -16,6 +16,7 @@ import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dar
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
@@ -34,6 +35,8 @@ final class Binder {
         return _bindDefinitionStatement(syntax as DefinitionStatementSyntax);
       case SyntaxKind.assignmentStatement:
         return _bindAssignmentStatement(syntax as AssignmentStatementSyntax);
+      case SyntaxKind.forLoop:
+        return _bindForLoop(syntax as ForLoopSyntax);
       default:
         return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
     }
@@ -142,6 +145,11 @@ final class Binder {
     }
 
     return BoundAssignmentStatement(name!, expression);
+  }
+
+  BoundStatement _bindForLoop(ForLoopSyntax syntax) {
+    /* Todo: bind for loop into BoundForLoop & add support into the evaluator
+             it probably just needs the before, end, between, and block statements */
   }
 
   Type? getType(SyntaxKind kind) {

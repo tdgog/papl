@@ -7,6 +7,7 @@ import 'package:prototype/tempus/parsing/lexer.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
@@ -99,7 +100,26 @@ class Parser {
         return AssignmentStatementSyntax(_nextToken(), _nextToken(), _parseExpression());
       }
 
-      return _parseExpressionStatement();
+      switch (_current.kind) {
+        case SyntaxKind.forKeyword:
+          return _parseForLoop();
+        default:
+          return _parseExpressionStatement();
+      }
+    }
+
+    StatementSyntax _parseForLoop() {
+      SyntaxToken forKeyword = _nextToken();
+      SyntaxToken openBracketToken = _nextToken();
+      StatementSyntax preLoopStatement = _parseStatement();
+      _nextToken(); // Consume semicolon after statement
+      ExpressionSyntax endLoopCheck = _parseExpression();
+      _nextToken(); // Consume semicolon after statement
+      StatementSyntax afterIterationStatement = _parseStatement();
+      SyntaxToken closeBracketToken = _nextToken();
+      StatementSyntax loopBlock = _parseScope();
+      return ForLoopSyntax(forKeyword, openBracketToken, preLoopStatement,
+          endLoopCheck, afterIterationStatement, closeBracketToken, loopBlock);
     }
 
     StatementSyntax _parseScope() {

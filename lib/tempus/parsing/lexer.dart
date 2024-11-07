@@ -68,6 +68,18 @@ class Lexer {
         return SyntaxToken(SyntaxKind.openBraceToken, _position++, '{');
       case '}':
         return SyntaxToken(SyntaxKind.closeBraceToken, _position++, '}');
+      case '<':
+        if (_peek(1) == '=') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.lessThanOrEqualToToken, _position, '<=');
+        }
+        return SyntaxToken(SyntaxKind.lessThanToken, _position++, '<');
+      case '>':
+        if (_peek(1) == '=') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.greaterThanOrEqualToToken, _position, '>=');
+        }
+        return SyntaxToken(SyntaxKind.greaterThanToken, _position++, '>');
       case '=':
         if (_peek(1) == '=') {
           _position += 2;
@@ -142,12 +154,14 @@ class Lexer {
         return SyntaxToken(SyntaxKind.trueKeyword, start, 'true', true);
       case "false":
         return SyntaxToken(SyntaxKind.falseKeyword, start, 'false', false);
+      case "for":
+        return SyntaxToken(SyntaxKind.forKeyword, start, 'for');
       default:
         return SyntaxToken(SyntaxKind.identifierToken, start, value, value);
     }
   }
 
-  bool _isDigit(String s) => (s.codeUnitAt(0) ^ 0x30) <= 9;
+  bool _isDigit(String s) => s.length == 1 && "0123456789".contains(s);
   bool _isInteger(String s) => int.tryParse(s) != null;
   bool _isFloat(String s) => double.tryParse(s) != null;
   bool _isWhitespace(String s) => s == ' ' || s == '\t' || s == '\n' || s == '\r';

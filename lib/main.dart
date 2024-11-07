@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final myController = TextEditingController(text: "int a = 5; \na + 150;");
+  final myController = TextEditingController(text: "for (int i = 0; i < 10; i = i + 1) {\n\t10;\n}");
   String output = "";
 
   @override

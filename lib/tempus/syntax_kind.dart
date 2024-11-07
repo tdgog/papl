@@ -7,6 +7,10 @@ enum SyntaxKind {
   integerToken,
   floatToken,
   equalsToken,
+  lessThanOrEqualToToken,
+  lessThanToken,
+  greaterThanOrEqualToToken,
+  greaterThanToken,
   plusToken,
   minusToken,
   multiplyToken,
@@ -35,12 +39,14 @@ enum SyntaxKind {
   assignmentStatement,
   blockStatement,
   expressionStatement,
+  forLoop,
 
   // Keywords
   trueKeyword,
   falseKeyword,
+  forKeyword,
 
-  compilationUnit,
+  compilationUnit
 }
 
 extension SyntaxKindExtension on SyntaxKind {
@@ -53,6 +59,10 @@ extension SyntaxKindExtension on SyntaxKind {
         return 2;
       case SyntaxKind.doubleEqualsToken:
       case SyntaxKind.bangEqualsToken:
+      case SyntaxKind.lessThanToken:
+      case SyntaxKind.lessThanOrEqualToToken:
+      case SyntaxKind.greaterThanToken:
+      case SyntaxKind.greaterThanOrEqualToToken:
         return 3;
       case SyntaxKind.plusToken:
       case SyntaxKind.minusToken:

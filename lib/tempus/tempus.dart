@@ -21,6 +21,7 @@ List<String> interpretString(String code) {
   }
 
   SyntaxTree tree = SyntaxTree(code);
+  tree.printTree();
 
   List<String> output = _interpretLines(tree.root.lines);
   return output;

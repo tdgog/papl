@@ -3,5 +3,6 @@ enum BoundNodeKind {
   binaryExpression,
   unaryExpression,
   assignmentStatement,
-  variableExpression
+  variableExpression,
+  forLoop
 }
