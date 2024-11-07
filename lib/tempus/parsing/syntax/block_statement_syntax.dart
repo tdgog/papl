@@ -12,7 +12,7 @@ class BlockStatementSyntax extends StatementSyntax {
   BlockStatementSyntax(this._openBraceToken, this._statements, this._closeBraceToken);
 
   @override
-  Iterable<SyntaxNode>? get children => null;
+  Iterable<SyntaxNode>? get children => [_openBraceToken, ..._statements, _closeBraceToken];
 
   @override
   SyntaxKind get kind => SyntaxKind.blockStatement;

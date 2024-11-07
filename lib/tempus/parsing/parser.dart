@@ -1,5 +1,6 @@
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/compilation_unit_syntax.dart';
 import 'package:prototype/tempus/parsing/lexer.dart';
@@ -83,6 +84,10 @@ class Parser {
     }
 
     StatementSyntax _parseStatement() {
+      if (_current.kind == SyntaxKind.openBraceToken) {
+        return _parseScope();
+      }
+
       if (_current.kind == SyntaxKind.identifierToken
           && _peek(1).kind == SyntaxKind.identifierToken
           && _peek(2).kind == SyntaxKind.equalsToken) {
@@ -95,6 +100,22 @@ class Parser {
       }
 
       return _parseExpressionStatement();
+    }
+
+    StatementSyntax _parseScope() {
+      SyntaxToken openBrace = _nextToken();
+      List<StatementSyntax> nestedStatements = [];
+      while (_current.kind != SyntaxKind.closeBraceToken) {
+        if (_current.kind == SyntaxKind.eolToken) {
+          _nextToken();
+          continue;
+        }
+
+        nestedStatements.add(_parseStatement());
+      }
+      SyntaxToken closeBrace = _nextToken();
+
+      return BlockStatementSyntax(openBrace, nestedStatements, closeBrace);
     }
 
     StatementSyntax _parseExpressionStatement() {

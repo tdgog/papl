@@ -12,7 +12,7 @@ abstract class SyntaxNode {
         + getColor(node.kind)
         + node.kind.toString().substring(11)
         + (node is SyntaxToken && node.value != null ? ' ${node.value}' : '')
-        + AnsiColors.RESET);
+        + AnsiColors.reset);
 
     if (node.children == null) {
       return;
@@ -28,17 +28,17 @@ abstract class SyntaxNode {
   static String getColor(SyntaxKind kind) {
     switch (kind) {
       case SyntaxKind.compilationUnit:
-        return AnsiColors.YELLOW;
+        return AnsiColors.yellow;
 
       case SyntaxKind.badToken:
-        return AnsiColors.RED;
+        return AnsiColors.red;
 
       case SyntaxKind.integerToken:
       case SyntaxKind.falseKeyword:
       case SyntaxKind.trueKeyword:
       case SyntaxKind.identifierToken:
       case SyntaxKind.floatToken:
-        return AnsiColors.CYAN;
+        return AnsiColors.cyan;
 
       case SyntaxKind.plusToken:
       case SyntaxKind.equalsToken:
@@ -53,7 +53,7 @@ abstract class SyntaxNode {
       case SyntaxKind.divideToken:
       case SyntaxKind.multiplyToken:
       case SyntaxKind.minusToken:
-        return AnsiColors.BLUE;
+        return AnsiColors.blue;
 
       case SyntaxKind.unaryExpression:
       case SyntaxKind.binaryExpression:
@@ -63,10 +63,10 @@ abstract class SyntaxNode {
       case SyntaxKind.definitionStatement:
       case SyntaxKind.assignmentStatement:
       case SyntaxKind.expressionStatement:
-          return AnsiColors.MAGENTA;
+          return AnsiColors.magenta;
 
       default:
-        return AnsiColors.RESET;
+        return AnsiColors.reset;
     }
   }
 }

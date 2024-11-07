@@ -123,7 +123,10 @@ class Evaluator {
 
   void _evaluateAssignmentStatement(BoundAssignmentStatement expression) {
     EvaluationResult value = _evaluateExpression(expression.expression);
-    variables[VariableSymbol(expression.name, expression.type)] = value.result;
+    VariableSymbol symbol = variables.getVariableSymbolFromName(expression.name)
+        ?? VariableSymbol(expression.name, expression.type);
+
+    variables[symbol] = value.result;
   }
 
 }

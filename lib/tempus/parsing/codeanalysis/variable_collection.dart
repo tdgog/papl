@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:collection/collection.dart';
 
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
 
@@ -15,7 +16,17 @@ extension AccessVariableCollectionByName on VariableCollection {
   }
 
   VariableSymbol? getVariableSymbolFromName(String? name) {
-    return keys.firstWhere((variable) => variable.name == name);
+    return keys.firstWhereOrNull((variable) => variable.name == name);
+  }
+
+}
+
+extension Print on VariableCollection {
+
+  void printCollection() {
+    print("{");
+    forEach((key, value) => print("\t${key.type} ${key.name} = $value"));
+    print("}");
   }
 
 }

@@ -24,7 +24,7 @@ import 'package:prototype/tempus/syntax_kind.dart';
 
 final class Binder {
 
-  VariableCollection _variables;
+  final VariableCollection _variables;
 
   Binder(this._variables);
 

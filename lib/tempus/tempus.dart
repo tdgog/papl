@@ -4,25 +4,50 @@ import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
+import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
+import 'package:prototype/tempus/syntax_node.dart';
 
 import 'syntax_tree.dart';
 
 bool _isInitialized = false;
 
 List<String> interpretString(String code) {
+  // Some areas need to be initialized the first time the interpreter runs
   if (!_isInitialized) {
     _isInitialized = true;
 
     BoundBinaryOperator.initialize();
   }
 
-  List<String> output = [];
-  VariableCollection variables = VariableCollection();
   SyntaxTree tree = SyntaxTree(code);
 
-  for (StatementSyntax expression in tree.root.lines) {
-    Binder binder = Binder(variables);
+  List<String> output = _interpretLines(tree.root.lines);
+  return output;
+}
+
+List<String> _interpretLines(List<StatementSyntax> lines, {VariableCollection? previous}) {
+  VariableCollection variables = VariableCollection.from(previous ?? {});
+  Binder binder = Binder(variables);
+
+  List<String> output = [];
+  for (StatementSyntax expression in lines) {
+    // Handle nested blocks
+    if (expression is BlockStatementSyntax && expression.children != null) {
+      // Extract all statements in the scope, ignoring the open and close braces
+      List<StatementSyntax> statements = [];
+      for (SyntaxNode node in expression.children!) {
+        if (node is StatementSyntax) {
+          statements.add(node);
+        }
+      }
+
+      List<String> nestedOutput = _interpretLines(statements, previous: variables);
+      output.addAll(nestedOutput);
+
+      continue;
+    }
+
     BoundStatement boundStatement = binder.bindStatement(expression);
     Evaluator evaluator = Evaluator(boundStatement, variables);
     var result = evaluator.evaluate();
@@ -31,6 +56,14 @@ List<String> interpretString(String code) {
       output.add("$result");
     }
   }
+
+  // Promote any existing variables which have been modified at the end of scope execution
+  print("end of scope, previous = $previous");
+  if (previous != null) {
+    previous.updateAll((key, _) => variables[key]!);
+    previous.printCollection();
+  }
+  variables.printCollection();
 
   return output;
 }

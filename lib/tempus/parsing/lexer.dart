@@ -147,6 +147,6 @@ class Lexer {
   bool _isInteger(String s) => int.tryParse(s) != null;
   bool _isFloat(String s) => double.tryParse(s) != null;
   bool _isWhitespace(String s) => s == ' ' || s == '\t' || s == '\n' || s == '\r';
-  bool _isLetter(String s) => (s.codeUnitAt(0) ^ 0x41) <= 26 || (s.codeUnitAt(0) ^ 0x61) <= 26;
+  bool _isLetter(String s) => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".contains(s);
 
 }
