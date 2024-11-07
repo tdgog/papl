@@ -70,21 +70,25 @@ class Lexer {
         return SyntaxToken(SyntaxKind.closeBraceToken, _position++, '}');
       case '=':
         if (_peek(1) == '=') {
+          _position += 2;
           return SyntaxToken(SyntaxKind.doubleEqualsToken, _position, '==');
         }
         return SyntaxToken(SyntaxKind.equalsToken, _position++, '=');
       case '!':
         if (_peek(1) == '=') {
+          _position += 2;
           return SyntaxToken(SyntaxKind.bangEqualsToken, _position, '!=');
         }
         return SyntaxToken(SyntaxKind.bangToken, _position++, '!');
       case '&':
         if (_peek(1) == '&') {
+          _position += 2;
           return SyntaxToken(SyntaxKind.doubleAmpersandToken, _position, '&&');
         }
         break;
       case '|':
         if (_peek(1) == '|') {
+          _position += 2;
           return SyntaxToken(SyntaxKind.doublePipeToken, _position, '||');
         }
         break;
