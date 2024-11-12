@@ -20,6 +20,7 @@ import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart
 import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_node_kind.dart';
+import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator_kind.dart';
@@ -130,6 +131,8 @@ class Evaluator {
         return _evaluateForLoop(node as BoundForLoop);
       case BoundNodeKind.block:
         return _evaluateBlock(node as BoundBlock);
+      case BoundNodeKind.printStatement:
+        return _evaluatePrintStatement(node as BoundPrintStatement);
       default:
         throw Exception('Unexpected node ${node.kind}');
     }
@@ -159,6 +162,10 @@ class Evaluator {
       Evaluator(statement, blockVariables).evaluate();
     }
     variables.updateAll((key, _) => blockVariables[key]!);
+  }
+
+  void _evaluatePrintStatement(BoundPrintStatement statement) {
+    print(_evaluateExpression(statement.expression).result);
   }
 
 }

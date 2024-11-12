@@ -156,6 +156,8 @@ class Lexer {
         return SyntaxToken(SyntaxKind.falseKeyword, start, 'false', false);
       case "for":
         return SyntaxToken(SyntaxKind.forKeyword, start, 'for');
+      case "print":
+        return SyntaxToken(SyntaxKind.printKeyword, start, 'print');
       default:
         return SyntaxToken(SyntaxKind.identifierToken, start, value, value);
     }

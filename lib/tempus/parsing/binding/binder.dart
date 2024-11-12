@@ -6,6 +6,7 @@ import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
+import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator.dart';
@@ -22,6 +23,7 @@ import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dar
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/print_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
@@ -43,6 +45,8 @@ final class Binder {
         return _bindBlock(syntax as BlockStatementSyntax);
       case SyntaxKind.forLoop:
         return _bindForLoop(syntax as ForLoopSyntax);
+      case SyntaxKind.printStatement:
+        return _bindPrintStatement(syntax as PrintSyntax);
       default:
         return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
     }
@@ -180,6 +184,10 @@ final class Binder {
       SyntaxKind.trueKeyword: bool,
       SyntaxKind.falseKeyword: bool
     }[kind];
+  }
+
+  BoundStatement _bindPrintStatement(PrintSyntax syntax) {
+    return BoundPrintStatement(_bindExpression(syntax.expression));
   }
 
   Type? nameToType(String name) {

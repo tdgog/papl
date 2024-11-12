@@ -46,7 +46,11 @@ enum SyntaxKind {
   falseKeyword,
   forKeyword,
 
-  compilationUnit
+  compilationUnit,
+
+  // Temp
+  printKeyword,
+  printStatement
 }
 
 extension SyntaxKindExtension on SyntaxKind {

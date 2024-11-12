@@ -10,6 +10,7 @@ import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/print_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
@@ -103,9 +104,17 @@ class Parser {
       switch (_current.kind) {
         case SyntaxKind.forKeyword:
           return _parseForLoop();
+        case SyntaxKind.printKeyword:
+          return _parsePrintStatement();
         default:
           return _parseExpressionStatement();
       }
+    }
+
+    StatementSyntax _parsePrintStatement() {
+      SyntaxToken printKeyword = _nextToken();
+      ExpressionSyntax expression = _parseExpression();
+      return PrintSyntax(printKeyword, expression);
     }
 
     StatementSyntax _parseForLoop() {
