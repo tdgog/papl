@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:prototype/tempus/tempus.dart';
 
 void main() {
@@ -31,7 +33,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final myController = TextEditingController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n\tcount = count + 2;\n}\nprint count;");
+  final myController = TextEditingController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n    count = count + 2;\n}\nprint count;");
   String output = "";
 
   @override
@@ -48,13 +50,32 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            TextField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter some code',
-              ),
-              controller: myController,
-              maxLines: null,
+            Focus(
+              onKeyEvent: (node, event) {
+                // When pressing the tab key, 4 spaces should be inserted at the cursor position
+                // rather than changing focus
+                if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+                  int pos = myController.selection.base.offset;
+                  String before = myController.text.substring(0, pos);
+                  String after = myController.text.substring(pos);
+
+                  myController.text = '$before    $after';
+                  myController.selection = TextSelection(baseOffset: pos + 4, extentOffset: pos + 4);
+
+                  return KeyEventResult.handled;
+                }
+
+                return KeyEventResult.ignored;
+              },
+                child: TextField(
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Enter some code',
+                  ),
+                  style: GoogleFonts.robotoMono(),
+                  controller: myController,
+                  maxLines: null,
+                )
             ),
             TextButton(
               onPressed: () {
