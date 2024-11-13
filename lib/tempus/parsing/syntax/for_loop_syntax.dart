@@ -1,4 +1,3 @@
-import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_node.dart';
@@ -9,7 +8,7 @@ class ForLoopSyntax extends StatementSyntax {
   final SyntaxToken forKeyword;
   final SyntaxToken openBracketToken;
   final StatementSyntax preLoopStatement;
-  final ExpressionSyntax startLoopCheck;
+  final StatementSyntax startLoopCheck;
   final StatementSyntax afterIterationStatement;
   final SyntaxToken closeBracketToken;
   final StatementSyntax loopBlock;

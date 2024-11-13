@@ -12,6 +12,7 @@ import 'package:prototype/tempus/evaluator/visitors/multiplication_visitor.dart'
 import 'package:prototype/tempus/evaluator/visitors/subtraction_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/visitor.dart';
 import 'package:prototype/tempus/parsing/binding/BoundBlock.dart';
+import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator_kind.dart';
@@ -44,16 +45,20 @@ final Map<BoundBinaryOperatorKind, Visitor> binaryOperatorVisitors = {
 
 class Evaluator {
 
-  final BoundStatement root;
+  final BoundStatement? root;
   final VariableCollection variables;
 
-  Evaluator(this.root, this.variables);
+  Evaluator(this.variables, [this.root]);
 
   Object? evaluate() {
+    if (root == null) {
+      throw Exception("Attempt to evaluate from null root");
+    }
+
     if (root is BoundExpressionStatement) {
       return _evaluateExpression((root as BoundExpressionStatement).expression).result;
     }
-    _evaluateStatement(root);
+    _evaluateStatement(root!);
     return null;
   }
 
@@ -147,19 +152,36 @@ class Evaluator {
   }
 
   void _evaluateForLoop(BoundForLoop expression) {
+    // Set up new evaluator to keep for loop variables scoped properly
+    VariableCollection blockVariables = VariableCollection.from(variables);
+    Evaluator evaluator = Evaluator(blockVariables);
+
+    Binder binder = Binder(blockVariables);
+
+    // Bind and execute the first statement
+    BoundStatement boundPreLoopStatement = binder.bindStatement(expression.preLoopStatement);
+    evaluator._evaluateStatement(boundPreLoopStatement);
+
+    // Bind the other statements
+    BoundExpression boundStartIterationCheck = (binder.bindStatement(expression.startIterationCheck) as BoundExpressionStatement).expression;
+    BoundStatement boundAfterIterationStatement = binder.bindStatement(expression.afterIterationStatement);
+    BoundStatement boundLoopBlock = binder.bindStatement(expression.loopBlock);
+
     for (
-      _evaluateStatement(expression.preLoopStatement);
-      _evaluateExpression(expression.startIterationCheck).result as bool;
-      _evaluateStatement(expression.afterIterationStatement)
+      ;
+      evaluator._evaluateExpression(boundStartIterationCheck).result as bool;
+      evaluator._evaluateStatement(boundAfterIterationStatement)
     ) {
-      _evaluateStatement(expression.loopBlock);
+      evaluator._evaluateStatement(boundLoopBlock);
     }
+
+    variables.updateAll((key, _) => blockVariables[key]!);
   }
 
   void _evaluateBlock(BoundBlock expression) {
     VariableCollection blockVariables = VariableCollection.from(variables);
     for (BoundStatement statement in expression.statements) {
-      Evaluator(statement, blockVariables).evaluate();
+      Evaluator(blockVariables, statement).evaluate();
     }
     variables.updateAll((key, _) => blockVariables[key]!);
   }

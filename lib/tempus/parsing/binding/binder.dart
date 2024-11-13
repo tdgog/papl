@@ -138,6 +138,7 @@ final class Binder {
       throw Exception('Expression type does not match variable type');
     }
 
+    _variables[VariableSymbol(name, type!)] = '';
     return BoundAssignmentStatement(name, expression);
   }
 
@@ -169,12 +170,8 @@ final class Binder {
   }
 
   BoundStatement _bindForLoop(ForLoopSyntax syntax) {
-    BoundStatement preLoopStatement = bindStatement(syntax.preLoopStatement);
-    BoundExpression startIterationCheck = _bindExpression(syntax.startLoopCheck);
-    BoundStatement afterIterationStatement = bindStatement(syntax.afterIterationStatement);
-    BoundStatement loopBlock = bindStatement(syntax.loopBlock);
-
-    return BoundForLoop(preLoopStatement, startIterationCheck, afterIterationStatement, loopBlock);
+    return BoundForLoop(syntax.preLoopStatement, syntax.startLoopCheck,
+        syntax.afterIterationStatement, syntax.loopBlock);
   }
 
   Type? getType(SyntaxKind kind) {

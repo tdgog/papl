@@ -128,7 +128,8 @@ class Parser {
       SyntaxToken closeBracketToken = _nextToken();
       StatementSyntax loopBlock = _parseScope();
       return ForLoopSyntax(forKeyword, openBracketToken, preLoopStatement,
-          startLoopCheck, afterIterationStatement, closeBracketToken, loopBlock);
+          ExpressionStatementSyntax(startLoopCheck), afterIterationStatement,
+          closeBracketToken, loopBlock);
     }
 
     StatementSyntax _parseScope() {

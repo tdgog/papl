@@ -5,4 +5,9 @@ final class VariableSymbol {
 
   VariableSymbol(this.name, this.type);
 
+  @override
+  String toString() {
+    return 'VariableSymbol[$type $name]';
+  }
+
 }

@@ -50,7 +50,7 @@ List<String> _interpretLines(List<StatementSyntax> lines, {VariableCollection? p
     }
 
     BoundStatement boundStatement = binder.bindStatement(expression);
-    Evaluator evaluator = Evaluator(boundStatement, variables);
+    Evaluator evaluator = Evaluator(variables, boundStatement);
     var result = evaluator.evaluate();
 
     if (boundStatement is BoundExpressionStatement) {
