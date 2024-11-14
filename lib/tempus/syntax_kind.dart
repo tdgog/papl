@@ -12,7 +12,9 @@ enum SyntaxKind {
   greaterThanOrEqualToToken,
   greaterThanToken,
   plusToken,
+  doublePlusToken,
   minusToken,
+  doubleMinusToken,
   multiplyToken,
   divideToken,
   moduloToken,
@@ -40,11 +42,14 @@ enum SyntaxKind {
   blockStatement,
   expressionStatement,
   forLoop,
+  ifStatement,
 
   // Keywords
   trueKeyword,
   falseKeyword,
   forKeyword,
+  ifKeyword,
+  elseKeyword,
 
   compilationUnit,
 
@@ -82,6 +87,9 @@ extension SyntaxKindExtension on SyntaxKind {
 
   int get unaryOperatorPrecedence {
     switch (this) {
+      case SyntaxKind.doublePlusToken:
+      case SyntaxKind.doubleMinusToken:
+        return 20;
       case SyntaxKind.plusToken:
       case SyntaxKind.minusToken:
       case SyntaxKind.bangToken:

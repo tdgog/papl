@@ -8,6 +8,7 @@ import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dar
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/if_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/print_syntax.dart';
@@ -106,9 +107,31 @@ class Parser {
           return _parseForLoop();
         case SyntaxKind.printKeyword:
           return _parsePrintStatement();
+        case SyntaxKind.ifKeyword:
+          return _parseIfStatement();
         default:
           return _parseExpressionStatement();
       }
+    }
+
+    StatementSyntax _parseIfStatement() {
+      // If clause
+      SyntaxToken ifKeyword = _nextToken();
+      SyntaxToken openBracketToken = _nextToken();
+      ExpressionSyntax condition = _parseExpression();
+      SyntaxToken closeBracketToken = _nextToken();
+      StatementSyntax trueStatement = _parseStatement();
+
+      SyntaxToken? elseKeyword;
+      StatementSyntax? falseStatement;
+      if (_current.kind == SyntaxKind.elseKeyword) {
+        elseKeyword = _nextToken();
+        falseStatement = _parseStatement();
+      }
+
+      return IfStatementSyntax(ifKeyword, openBracketToken,
+          ExpressionStatementSyntax(condition), closeBracketToken,
+          trueStatement, elseKeyword, falseStatement);
     }
 
     StatementSyntax _parsePrintStatement() {

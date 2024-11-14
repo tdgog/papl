@@ -1,10 +1,12 @@
-import 'package:prototype/tempus/parsing/binding/BoundBlock.dart';
+import 'package:prototype/tempus/parsing/binding/bound_block.dart';
 import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
+import 'package:prototype/tempus/parsing/binding/bound_empty_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
+import 'package:prototype/tempus/parsing/binding/bound_if_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
@@ -21,6 +23,7 @@ import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/if_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/print_syntax.dart';
@@ -47,12 +50,14 @@ final class Binder {
         return _bindForLoop(syntax as ForLoopSyntax);
       case SyntaxKind.printStatement:
         return _bindPrintStatement(syntax as PrintSyntax);
+      case SyntaxKind.ifStatement:
+        return _bindIfStatement(syntax as IfStatementSyntax);
       default:
         return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
     }
   }
 
-  BoundStatement _bindExpressionStatement(ExpressionStatementSyntax syntax) {
+  BoundExpressionStatement _bindExpressionStatement(ExpressionStatementSyntax syntax) {
     return BoundExpressionStatement(_bindExpression(syntax.children!.first as ExpressionSyntax));
   }
 
@@ -174,6 +179,20 @@ final class Binder {
         syntax.afterIterationStatement, syntax.loopBlock);
   }
 
+  BoundStatement _bindPrintStatement(PrintSyntax syntax) {
+    return BoundPrintStatement(_bindExpression(syntax.expression));
+  }
+
+  BoundStatement _bindIfStatement(IfStatementSyntax syntax) {
+    return BoundIfStatement(
+        _bindExpressionStatement(syntax.condition),
+        bindStatement(syntax.trueStatement),
+        syntax.falseStatement == null
+            ? BoundExpressionStatement(BoundEmptyExpression())
+            : bindStatement(syntax.falseStatement!)
+    );
+  }
+
   Type? getType(SyntaxKind kind) {
     return {
       SyntaxKind.integerToken: int,
@@ -181,10 +200,6 @@ final class Binder {
       SyntaxKind.trueKeyword: bool,
       SyntaxKind.falseKeyword: bool
     }[kind];
-  }
-
-  BoundStatement _bindPrintStatement(PrintSyntax syntax) {
-    return BoundPrintStatement(_bindExpression(syntax.expression));
   }
 
   Type? nameToType(String name) {

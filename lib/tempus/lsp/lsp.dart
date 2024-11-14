@@ -21,6 +21,8 @@ List<EditorColorRecord> lsp(String code) {
 
       case SyntaxKind.forKeyword:
       case SyntaxKind.printKeyword:
+      case SyntaxKind.ifKeyword:
+      case SyntaxKind.elseKeyword:
         colors.add(EditorColorRecord(token, EditorColorType.keyword));
 
       default:

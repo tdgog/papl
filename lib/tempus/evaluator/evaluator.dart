@@ -11,14 +11,16 @@ import 'package:prototype/tempus/evaluator/visitors/modulo_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/multiplication_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/subtraction_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/visitor.dart';
-import 'package:prototype/tempus/parsing/binding/BoundBlock.dart';
+import 'package:prototype/tempus/parsing/binding/bound_block.dart';
 import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator_kind.dart';
+import 'package:prototype/tempus/parsing/binding/bound_empty_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
+import 'package:prototype/tempus/parsing/binding/bound_if_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_node_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
@@ -55,10 +57,14 @@ class Evaluator {
       throw Exception("Attempt to evaluate from null root");
     }
 
-    if (root is BoundExpressionStatement) {
-      return _evaluateExpression((root as BoundExpressionStatement).expression).result;
+    return _evaluateFrom(root!);
+  }
+
+  Object? _evaluateFrom(BoundStatement from) {
+    if (from is BoundExpressionStatement) {
+      return _evaluateExpression(from.expression).result;
     }
-    _evaluateStatement(root!);
+    _evaluateStatement(from);
     return null;
   }
 
@@ -72,6 +78,8 @@ class Evaluator {
         return _evaluateUnaryExpression(node as BoundUnaryExpression);
       case BoundNodeKind.binaryExpression:
         return _evaluateBinaryExpression(node as BoundBinaryExpression);
+      case BoundNodeKind.emptyExpression:
+        return EvaluationResult(Null, Null);
       default:
         throw Exception('Unexpected node ${node.kind}');
     }
@@ -138,6 +146,8 @@ class Evaluator {
         return _evaluateBlock(node as BoundBlock);
       case BoundNodeKind.printStatement:
         return _evaluatePrintStatement(node as BoundPrintStatement);
+      case BoundNodeKind.ifStatement:
+        return _evaluateIfStatement(node as BoundIfStatement);
       default:
         throw Exception('Unexpected node ${node.kind}');
     }
@@ -188,6 +198,21 @@ class Evaluator {
 
   void _evaluatePrintStatement(BoundPrintStatement statement) {
     print(_evaluateExpression(statement.expression).result);
+  }
+
+  void _evaluateIfStatement(BoundIfStatement statement) {
+    if (_evaluateExpression(statement.condition.expression).result as bool) {
+      _evaluateFrom(statement.trueStatement);
+    } else {
+      // If there is no else statement, move on
+      if (statement.falseStatement is BoundExpressionStatement) {
+        if ((statement.falseStatement as BoundExpressionStatement).expression is BoundEmptyExpression) {
+          return;
+        }
+      }
+
+      _evaluateFrom(statement.falseStatement);
+    }
   }
 
 }

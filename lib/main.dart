@@ -39,7 +39,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var myController = SyntaxHighlightingTextController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n    count = count + 2;\n}\nprint count;");
+  //int count = 0;
+  // if (count == 0) {
+  //     print count;
+  // } else {
+  //     print count + 1;
+  // }
+  // var myController = SyntaxHighlightingTextController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n    count = count + 2;\n}\nprint count;");
+  var myController = SyntaxHighlightingTextController(text: "int count = 0;\nif (count == 0) {\n    print 1;\n} else print 0;");
   String output = "";
 
   @override

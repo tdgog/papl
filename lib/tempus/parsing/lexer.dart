@@ -51,8 +51,16 @@ class Lexer {
       case ';':
         return SyntaxToken(SyntaxKind.eolToken, _position++, ';');
       case '+':
+        if (_peek(1) == '+') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.doublePlusToken, _position, '>=');
+        }
         return SyntaxToken(SyntaxKind.plusToken, _position++, '+');
       case '-':
+        if (_peek(1) == '+') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.doubleMinusToken, _position, '>=');
+        }
         return SyntaxToken(SyntaxKind.minusToken, _position++, '-');
       case '*':
         return SyntaxToken(SyntaxKind.multiplyToken, _position++, '*');
@@ -156,6 +164,10 @@ class Lexer {
         return SyntaxToken(SyntaxKind.falseKeyword, start, 'false', false);
       case "for":
         return SyntaxToken(SyntaxKind.forKeyword, start, 'for');
+      case "if":
+        return SyntaxToken(SyntaxKind.ifKeyword, start, 'if');
+      case "else":
+        return SyntaxToken(SyntaxKind.elseKeyword, start, 'else');
       case "print":
         return SyntaxToken(SyntaxKind.printKeyword, start, 'print');
       default:
