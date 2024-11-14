@@ -19,11 +19,11 @@ import 'package:prototype/tempus/syntax_token.dart';
 class Parser {
 
     final String _text;
-    late final List<SyntaxToken> _tokens;
+    late final List<SyntaxToken> tokens;
     int _position = 0;
 
     Parser(this._text) {
-      _tokens = _lex(_text);
+      tokens = _lex(_text);
     }
 
     List<SyntaxToken> _lex(String text) {
@@ -44,11 +44,11 @@ class Parser {
 
     SyntaxToken _peek(int offset) {
       int index = _position + offset;
-      if (index >= _tokens.length) {
-        return _tokens[_tokens.length - 1];
+      if (index >= tokens.length) {
+        return tokens[tokens.length - 1];
       }
 
-      return _tokens[index];
+      return tokens[index];
     }
 
     SyntaxToken get _current => _peek(0);

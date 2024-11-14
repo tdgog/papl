@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:prototype/editor/rich_text_controller.dart';
 import 'package:prototype/tempus/tempus.dart';
 
 void main() {
@@ -15,9 +16,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.light,
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.dark,
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -33,7 +39,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final myController = TextEditingController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n    count = count + 2;\n}\nprint count;");
+  var myController = SyntaxHighlightingTextController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n    count = count + 2;\n}\nprint count;");
   String output = "";
 
   @override
