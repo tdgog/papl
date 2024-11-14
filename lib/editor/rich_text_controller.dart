@@ -7,18 +7,6 @@ class SyntaxHighlightingTextController extends TextEditingController {
     super.text,
   });
 
-  /// Setting this will notify all the listeners of this [TextEditingController]
-  /// that they need to update (it calls [notifyListeners]).
-  @override
-  set text(String newText) {
-    value = value.copyWith(
-      text: newText,
-      selection: const TextSelection.collapsed(offset: -1),
-      composing: TextRange.empty,
-    );
-  }
-
-  /// Builds [TextSpan] from current editing value.
   @override
   TextSpan buildTextSpan({required BuildContext context, TextStyle? style, required bool withComposing}) {
     List<EditorColorRecord> colors = lsp(text);
