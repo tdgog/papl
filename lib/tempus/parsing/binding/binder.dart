@@ -73,6 +73,8 @@ final class Binder {
         return _bindBracketExpression(syntax as BracketExpressionSyntax);
       case SyntaxKind.nameExpression:
         return _bindNameExpression(syntax as NameExpressionSyntax);
+      case SyntaxKind.emptyExpression:
+        return BoundEmptyExpression();
       default:
         throw Exception('Unexpected syntax ${syntax.kind}');
     }

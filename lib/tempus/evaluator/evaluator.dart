@@ -148,6 +148,8 @@ class Evaluator {
         return _evaluatePrintStatement(node as BoundPrintStatement);
       case BoundNodeKind.ifStatement:
         return _evaluateIfStatement(node as BoundIfStatement);
+      case BoundNodeKind.emptyExpression:
+        return;
       default:
         throw Exception('Unexpected node ${node.kind}');
     }

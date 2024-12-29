@@ -46,7 +46,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //     print count + 1;
   // }
   // var myController = SyntaxHighlightingTextController(text: "int count = 0;\nfor (int i = 0; i < 10; i = i + 1) {\n    count = count + 2;\n}\nprint count;");
-  var myController = SyntaxHighlightingTextController(text: "int count = 0;\nif (count == 0) {\n    print 1;\n} else print 0;");
+  // var myController = SyntaxHighlightingTextController(text: "int count = 0;\nif (count == 0) {\n    print 1;\n} else print 0;");
+  var myController = SyntaxHighlightingTextController(text: "for (int i = 0; i < 10; i = i + 1);");
   String output = "";
 
   @override

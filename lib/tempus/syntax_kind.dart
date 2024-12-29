@@ -35,6 +35,7 @@ enum SyntaxKind {
   bracketExpression,
   literalExpression,
   nameExpression,
+  emptyExpression,
 
   // Statements
   definitionStatement,

@@ -9,7 +9,7 @@ final class BoundExpressionStatement extends BoundStatement {
   BoundExpressionStatement(this.expression);
 
   @override
-  BoundNodeKind get kind => BoundNodeKind.literalExpression;
+  BoundNodeKind get kind => expression.kind;
 
   @override
   Type get type => expression.type;

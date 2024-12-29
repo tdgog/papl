@@ -5,6 +5,7 @@ import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/compilation_unit_syntax.dart';
 import 'package:prototype/tempus/parsing/lexer.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/empty_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
@@ -176,6 +177,9 @@ class Parser {
     }
 
     ExpressionSyntax _parseExpression() {
+      if (_current.kind == SyntaxKind.eolToken) {
+        return EmptyExpressionSyntax();
+      }
       return _parseBinaryExpression();
     }
 
