@@ -149,7 +149,7 @@ class Parser {
       _nextToken(); // Consume semicolon after statement
       StatementSyntax afterIterationStatement = _parseStatement();
       SyntaxToken closeBracketToken = _nextToken();
-      StatementSyntax loopBlock = _parseScope();
+      StatementSyntax loopBlock = _parseStatement();
       return ForLoopSyntax(forKeyword, openBracketToken, preLoopStatement,
           ExpressionStatementSyntax(startLoopCheck), afterIterationStatement,
           closeBracketToken, loopBlock);
