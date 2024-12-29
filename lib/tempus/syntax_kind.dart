@@ -52,6 +52,7 @@ enum SyntaxKind {
   trueKeyword,
   falseKeyword,
   forKeyword,
+  whileKeyword,
   ifKeyword,
   elseKeyword,
 

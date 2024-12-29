@@ -130,6 +130,8 @@ class Parser {
       switch (_current.kind) {
         case SyntaxKind.forKeyword:
           return _parseForLoop();
+        case SyntaxKind.whileKeyword:
+          return _parseWhileLoop();
         case SyntaxKind.printKeyword:
           return _parsePrintStatement();
         case SyntaxKind.ifKeyword:
@@ -177,6 +179,17 @@ class Parser {
       StatementSyntax loopBlock = _parseStatement();
       return ForLoopSyntax(forKeyword, openBracketToken, preLoopStatement,
           ExpressionStatementSyntax(startLoopCheck), afterIterationStatement,
+          closeBracketToken, loopBlock);
+    }
+
+    StatementSyntax _parseWhileLoop() {
+      SyntaxToken whileKeyword = _nextToken();
+      SyntaxToken openBracketToken = _nextToken();
+      ExpressionSyntax condition = _parseExpression();
+      SyntaxToken closeBracketToken = _nextToken();
+      StatementSyntax loopBlock = _parseStatement();
+      return ForLoopSyntax(whileKeyword, openBracketToken, ExpressionStatementSyntax(EmptyExpressionSyntax()),
+          ExpressionStatementSyntax(condition), ExpressionStatementSyntax(EmptyExpressionSyntax()),
           closeBracketToken, loopBlock);
     }
 

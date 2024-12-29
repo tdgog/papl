@@ -176,6 +176,8 @@ class Lexer {
         return SyntaxToken(SyntaxKind.falseKeyword, start, 'false', false);
       case "for":
         return SyntaxToken(SyntaxKind.forKeyword, start, 'for');
+      case "while":
+        return SyntaxToken(SyntaxKind.whileKeyword, start, 'while');
       case "if":
         return SyntaxToken(SyntaxKind.ifKeyword, start, 'if');
       case "else":
