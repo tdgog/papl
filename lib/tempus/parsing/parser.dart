@@ -103,6 +103,36 @@ class Parser {
         return AssignmentStatementSyntax(_nextToken(), _nextToken(), _parseExpression());
       }
 
+      if (_current.kind == SyntaxKind.identifierToken
+          && _peek(1).kind == SyntaxKind.plusEqualsToken) {
+        SyntaxToken variable = _nextToken();
+        int equalsPosition = _nextToken().position;
+        return AssignmentStatementSyntax(
+            variable,
+            SyntaxToken(SyntaxKind.equalsToken, equalsPosition, '+='),
+            BinaryExpressionSyntax(
+                NameExpressionSyntax(variable),
+                SyntaxToken(SyntaxKind.plusToken, equalsPosition, '+'),
+                _parseExpression()
+            )
+        );
+      }
+
+      if (_current.kind == SyntaxKind.identifierToken
+          && _peek(1).kind == SyntaxKind.minusEqualsToken) {
+        SyntaxToken variable = _nextToken();
+        int equalsPosition = _nextToken().position;
+        return AssignmentStatementSyntax(
+            variable,
+            SyntaxToken(SyntaxKind.equalsToken, equalsPosition, '+='),
+            BinaryExpressionSyntax(
+                NameExpressionSyntax(variable),
+                SyntaxToken(SyntaxKind.minusToken, equalsPosition, '-'),
+                _parseExpression()
+            )
+        );
+      }
+
       switch (_current.kind) {
         case SyntaxKind.forKeyword:
           return _parseForLoop();

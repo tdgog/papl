@@ -12,9 +12,9 @@ enum SyntaxKind {
   greaterThanOrEqualToToken,
   greaterThanToken,
   plusToken,
-  doublePlusToken,
+  plusEqualsToken,
   minusToken,
-  doubleMinusToken,
+  minusEqualsToken,
   multiplyToken,
   divideToken,
   moduloToken,
@@ -88,9 +88,6 @@ extension SyntaxKindExtension on SyntaxKind {
 
   int get unaryOperatorPrecedence {
     switch (this) {
-      case SyntaxKind.doublePlusToken:
-      case SyntaxKind.doubleMinusToken:
-        return 20;
       case SyntaxKind.plusToken:
       case SyntaxKind.minusToken:
       case SyntaxKind.bangToken:
