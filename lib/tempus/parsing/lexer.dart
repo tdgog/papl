@@ -53,20 +53,32 @@ class Lexer {
       case '+':
         if (_peek(1) == '=') {
           _position += 2;
-          return SyntaxToken(SyntaxKind.plusEqualsToken, _position, '>=');
+          return SyntaxToken(SyntaxKind.plusEqualsToken, _position, '+=');
         }
         return SyntaxToken(SyntaxKind.plusToken, _position++, '+');
       case '-':
         if (_peek(1) == '=') {
           _position += 2;
-          return SyntaxToken(SyntaxKind.minusEqualsToken, _position, '>=');
+          return SyntaxToken(SyntaxKind.minusEqualsToken, _position, '-=');
         }
         return SyntaxToken(SyntaxKind.minusToken, _position++, '-');
       case '*':
+        if (_peek(1) == '=') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.multiplyEqualsToken, _position, '*=');
+        }
         return SyntaxToken(SyntaxKind.multiplyToken, _position++, '*');
       case '/':
+        if (_peek(1) == '=') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.divideEqualsToken, _position, '/=');
+        }
         return SyntaxToken(SyntaxKind.divideToken, _position++, '/');
       case '%':
+        if (_peek(1) == '=') {
+          _position += 2;
+          return SyntaxToken(SyntaxKind.moduloEqualsToken, _position, '%=');
+        }
         return SyntaxToken(SyntaxKind.moduloToken, _position++, '%');
       case '(':
         return SyntaxToken(SyntaxKind.openBracketToken, _position++, '(');

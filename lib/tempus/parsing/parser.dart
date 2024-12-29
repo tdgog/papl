@@ -92,45 +92,39 @@ class Parser {
         return _parseScope();
       }
 
-      if (_current.kind == SyntaxKind.identifierToken
-          && _peek(1).kind == SyntaxKind.identifierToken
-          && _peek(2).kind == SyntaxKind.equalsToken) {
-        return DefinitionStatementSyntax(_nextToken(), _nextToken(), _nextToken(), _parseExpression());
-      }
+      if (_current.kind == SyntaxKind.identifierToken) {
+        SyntaxKind nextKind = _peek(1).kind;
+        switch(nextKind) {
+          // Variable declaration
+          case SyntaxKind.identifierToken:
+            if (_peek(2).kind == SyntaxKind.equalsToken) {
+              return DefinitionStatementSyntax(_nextToken(), _nextToken(), _nextToken(), _parseExpression());
+            }
+            break;
 
-      if (_current.kind == SyntaxKind.identifierToken
-          && _peek(1).kind == SyntaxKind.equalsToken) {
-        return AssignmentStatementSyntax(_nextToken(), _nextToken(), _parseExpression());
-      }
+          // Variable assignment
+          case SyntaxKind.equalsToken:
+            return AssignmentStatementSyntax(_nextToken(), _nextToken(), _parseExpression());
+          case SyntaxKind.plusEqualsToken:
+          case SyntaxKind.minusEqualsToken:
+          case SyntaxKind.multiplyEqualsToken:
+          case SyntaxKind.divideEqualsToken:
+          case SyntaxKind.moduloEqualsToken:
+            SyntaxToken variable = _nextToken();
+            int equalsPosition = _nextToken().position;
+            return AssignmentStatementSyntax(
+                variable,
+                SyntaxToken(SyntaxKind.equalsToken, equalsPosition, '?='),
+                BinaryExpressionSyntax(
+                    NameExpressionSyntax(variable),
+                    generateOperationEqualsToken(nextKind, equalsPosition),
+                    _parseExpression()
+                )
+            );
 
-      if (_current.kind == SyntaxKind.identifierToken
-          && _peek(1).kind == SyntaxKind.plusEqualsToken) {
-        SyntaxToken variable = _nextToken();
-        int equalsPosition = _nextToken().position;
-        return AssignmentStatementSyntax(
-            variable,
-            SyntaxToken(SyntaxKind.equalsToken, equalsPosition, '+='),
-            BinaryExpressionSyntax(
-                NameExpressionSyntax(variable),
-                SyntaxToken(SyntaxKind.plusToken, equalsPosition, '+'),
-                _parseExpression()
-            )
-        );
-      }
-
-      if (_current.kind == SyntaxKind.identifierToken
-          && _peek(1).kind == SyntaxKind.minusEqualsToken) {
-        SyntaxToken variable = _nextToken();
-        int equalsPosition = _nextToken().position;
-        return AssignmentStatementSyntax(
-            variable,
-            SyntaxToken(SyntaxKind.equalsToken, equalsPosition, '+='),
-            BinaryExpressionSyntax(
-                NameExpressionSyntax(variable),
-                SyntaxToken(SyntaxKind.minusToken, equalsPosition, '-'),
-                _parseExpression()
-            )
-        );
+          default:
+            break;
+        }
       }
 
       switch (_current.kind) {
@@ -260,6 +254,23 @@ class Parser {
             default:
               return LiteralExpressionSyntax(token);
           }
+      }
+    }
+
+    SyntaxToken generateOperationEqualsToken(SyntaxKind kind, int position) {
+      switch(kind) {
+        case SyntaxKind.plusEqualsToken:
+          return SyntaxToken(SyntaxKind.plusToken, position, '+');
+        case SyntaxKind.minusEqualsToken:
+          return SyntaxToken(SyntaxKind.minusToken, position, '-');
+        case SyntaxKind.multiplyEqualsToken:
+          return SyntaxToken(SyntaxKind.multiplyToken, position, '*');
+        case SyntaxKind.divideEqualsToken:
+          return SyntaxToken(SyntaxKind.divideToken, position, '/');
+        case SyntaxKind.moduloEqualsToken:
+          return SyntaxToken(SyntaxKind.moduloToken, position, '%');
+        default:
+          throw Exception("Invalid operation $kind - should not exist");
       }
     }
 
