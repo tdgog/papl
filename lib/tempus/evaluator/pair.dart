@@ -1,3 +1,4 @@
+/// A pair of types.
 class Pair {
   final Type left;
   final Type right;

@@ -45,6 +45,7 @@ final Map<BoundBinaryOperatorKind, Visitor> binaryOperatorVisitors = {
   BoundBinaryOperatorKind.greaterThanOrEqualTo: GreaterThanOrEqualToVisitor(),
 };
 
+/// Responsible for evaluating the bound tree
 class Evaluator {
 
   final BoundStatement? root;
@@ -52,6 +53,7 @@ class Evaluator {
 
   Evaluator(this.variables, [this.root]);
 
+  /// Evaluates the bound tree from the root and returns the result
   Object? evaluate() {
     if (root == null) {
       throw Exception("Attempt to evaluate from null root");
@@ -60,6 +62,7 @@ class Evaluator {
     return _evaluateFrom(root!);
   }
 
+  /// Evaluates the bound tree from the given [BoundStatement] and returns the result
   Object? _evaluateFrom(BoundStatement from) {
     if (from is BoundExpressionStatement) {
       return _evaluateExpression(from.expression).result;
@@ -68,6 +71,7 @@ class Evaluator {
     return null;
   }
 
+  /// Evaluates the given [BoundExpression] and returns the result
   EvaluationResult _evaluateExpression(BoundExpression node) {
     switch (node.kind) {
       case BoundNodeKind.literalExpression:
@@ -85,10 +89,12 @@ class Evaluator {
     }
   }
 
+  /// Creates an [EvaluationResult] from the given [BoundLiteralExpression]
   EvaluationResult _evaluateLiteralExpression(BoundLiteralExpression expression) {
     return EvaluationResult(expression.value, expression.type);
   }
 
+  /// Creates an [EvaluationResult] from the given [BoundVariableExpression]
   EvaluationResult _evaluateVariableExpression(BoundVariableExpression expression) {
     Object? result = variables.getVariableValue(expression.variable.name);
 
@@ -99,6 +105,7 @@ class Evaluator {
     return EvaluationResult(result, expression.variable.type);
   }
 
+  /// Evaluates a [BoundUnaryExpression], and returns the [EvaluationResult]
   EvaluationResult _evaluateUnaryExpression(BoundUnaryExpression expression) {
     EvaluationResult operand = _evaluateExpression(expression.operand);
     BoundUnaryOperatorKind operatorKind = expression.operator.operatorKind;
@@ -118,6 +125,7 @@ class Evaluator {
     throw Exception('Unexpected unary operator ${expression.operator}');
   }
 
+  /// Evaluates a [BoundBinaryExpression], and returns the [EvaluationResult]
   EvaluationResult _evaluateBinaryExpression(BoundBinaryExpression expression) {
     EvaluationResult left = _evaluateExpression(expression.left);
     EvaluationResult right = _evaluateExpression(expression.right);
@@ -136,6 +144,7 @@ class Evaluator {
     throw Exception('Unexpected binary operator ${expression.operator.operatorKind}');
   }
 
+  /// Evaluates a [BoundStatement]
   void _evaluateStatement(BoundStatement node) {
     switch (node.kind) {
       case BoundNodeKind.assignmentStatement:
@@ -155,6 +164,7 @@ class Evaluator {
     }
   }
 
+  /// Assigns a variable
   void _evaluateAssignmentStatement(BoundAssignmentStatement expression) {
     EvaluationResult value = _evaluateExpression(expression.expression);
     VariableSymbol symbol = variables.getVariableSymbolFromName(expression.name)
@@ -163,6 +173,7 @@ class Evaluator {
     variables[symbol] = value.result;
   }
 
+  /// Runs a for loop, also used for while loops
   void _evaluateForLoop(BoundForLoop expression) {
     // Set up new evaluator to keep for loop variables scoped properly
     VariableCollection blockVariables = VariableCollection.from(variables);
@@ -190,6 +201,7 @@ class Evaluator {
     variables.updateAll((key, _) => blockVariables[key]!);
   }
 
+  /// Creates and evaluates a scope
   void _evaluateBlock(BoundBlock expression) {
     VariableCollection blockVariables = VariableCollection.from(variables);
     for (BoundStatement statement in expression.statements) {
@@ -198,10 +210,12 @@ class Evaluator {
     variables.updateAll((key, _) => blockVariables[key]!);
   }
 
+  /// Evaluates print statements
   void _evaluatePrintStatement(BoundPrintStatement statement) {
     print(_evaluateExpression(statement.expression).result);
   }
 
+  /// Evaluates if/else statements
   void _evaluateIfStatement(BoundIfStatement statement) {
     if (_evaluateExpression(statement.condition.expression).result as bool) {
       _evaluateFrom(statement.trueStatement);

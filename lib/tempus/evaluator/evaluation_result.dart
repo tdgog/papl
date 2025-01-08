@@ -1,3 +1,4 @@
+/// Holds the result of an evaluation and its type.
 class EvaluationResult {
 
   final Object result;
