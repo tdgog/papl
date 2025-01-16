@@ -1,4 +1,7 @@
 import 'package:prototype/tempus/parsing/codeanalysis/ansi_colors.dart';
+import 'package:prototype/tempus/parsing/syntax/function_call_statement.dart';
+import 'package:prototype/tempus/parsing/syntax/function_declaration_statement_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/function_definition_statement_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
@@ -11,7 +14,7 @@ abstract class SyntaxNode {
         + (isFirst ? "" : isLast ? "└───" : "├───")
         + getColor(node.kind)
         + node.kind.toString().substring(11)
-        + (node is SyntaxToken && node.value != null ? ' ${node.value}' : '')
+        + afterKind(node)
         + AnsiColors.reset);
 
     if (node.children == null) {
@@ -23,6 +26,18 @@ abstract class SyntaxNode {
     for (SyntaxNode child in node.children!) {
       printTree(child, indent, false, child == lastChild);
     }
+  }
+
+  static String afterKind(SyntaxNode node) {
+    if (node is FunctionDeclarationStatementSyntax) {
+      return ' ${node.returnType.value} ${node.name.value}(${node.parameters.map((e) => '${e.type} ${e.name}').join(', ')})';
+    } else if (node is FunctionDefinitionStatementSyntax) {
+      return ' ${node.returnType.value} ${node.name.value}(${node.parameters.map((e) => '${e.type} ${e.name}').join(', ')})';
+    } else if (node is FunctionCallExpression) {
+      return ' ${node.name.value}';
+    }
+
+    return node is SyntaxToken && node.value != null ? ' ${node.value}' : '';
   }
 
   static String getColor(SyntaxKind kind) {
@@ -53,6 +68,12 @@ abstract class SyntaxNode {
       case SyntaxKind.divideToken:
       case SyntaxKind.multiplyToken:
       case SyntaxKind.minusToken:
+      case SyntaxKind.openBraceToken:
+      case SyntaxKind.closeBraceToken:
+      case SyntaxKind.lessThanOrEqualToToken:
+      case SyntaxKind.lessThanToken:
+      case SyntaxKind.greaterThanOrEqualToToken:
+      case SyntaxKind.greaterThanToken:
         return AnsiColors.blue;
 
       case SyntaxKind.unaryExpression:
@@ -67,10 +88,15 @@ abstract class SyntaxNode {
       case SyntaxKind.functionCallStatement:
       case SyntaxKind.functionDeclarationStatement:
       case SyntaxKind.functionDefinitionStatement:
+      case SyntaxKind.blockStatement:
+      case SyntaxKind.ifStatement:
+      case SyntaxKind.forLoop:
+      case SyntaxKind.emptyExpression:
           return AnsiColors.magenta;
 
-      case SyntaxKind.forLoop:
       case SyntaxKind.printKeyword:
+      case SyntaxKind.whileKeyword:
+      case SyntaxKind.forKeyword:
         return AnsiColors.green;
 
       default:
