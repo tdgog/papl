@@ -6,6 +6,7 @@ import 'package:prototype/tempus/parsing/binding/bound_empty_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
+import 'package:prototype/tempus/parsing/binding/bound_function_call_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_if_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
@@ -13,6 +14,7 @@ import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator.dart';
 import 'package:prototype/tempus/parsing/binding/bound_variable_expression.dart';
+import 'package:prototype/tempus/parsing/codeanalysis/function.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
 import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
@@ -23,6 +25,9 @@ import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/function_call_statement.dart';
+import 'package:prototype/tempus/parsing/syntax/function_declaration_statement_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/function_definition_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/if_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
@@ -44,6 +49,10 @@ final class Binder {
         return _bindDefinitionStatement(syntax as DefinitionStatementSyntax);
       case SyntaxKind.assignmentStatement:
         return _bindAssignmentStatement(syntax as AssignmentStatementSyntax);
+      case SyntaxKind.functionDeclarationStatement:
+        return _bindFunctionDeclarationStatement(syntax as FunctionDeclarationStatementSyntax);
+      case SyntaxKind.functionDefinitionStatement:
+        return _bindFunctionDefinitionStatement(syntax as FunctionDefinitionStatementSyntax);
       case SyntaxKind.blockStatement:
         return _bindBlock(syntax as BlockStatementSyntax);
       case SyntaxKind.forLoop:
@@ -73,6 +82,8 @@ final class Binder {
         return _bindBracketExpression(syntax as BracketExpressionSyntax);
       case SyntaxKind.nameExpression:
         return _bindNameExpression(syntax as NameExpressionSyntax);
+      case SyntaxKind.functionCallStatement:
+        return _bindFunctionCall(syntax as FunctionCallExpression);
       case SyntaxKind.emptyExpression:
         return BoundEmptyExpression();
       default:
@@ -131,7 +142,33 @@ final class Binder {
 
     return BoundVariableExpression(VariableSymbol(name!, type));
   }
-  
+
+  BoundExpression _bindFunctionCall(FunctionCallExpression syntax) {
+    String? name = syntax.name.text;
+    if(!_variables.containsVariable(name)) {
+      throw Exception('Function $name does not exist');
+    }
+
+    FunctionContainer function = globals.getVariableValue(name) as FunctionContainer;
+
+    if (syntax.arguments.length != function.parameters.length) {
+      throw Exception('Function $name requires ${function.parameters.length} arguments');
+    }
+
+    // Check types using new binder
+    List<BoundExpression> arguments = [];
+    Binder binder = Binder(VariableCollection.from(_variables));
+    for (ExpressionSyntax argument in syntax.arguments) {
+      BoundExpression boundArgument = binder._bindExpression(argument);
+      if (boundArgument.type != function.parameters[arguments.length].type) {
+        throw Exception('Argument type does not match parameter type');
+      }
+      arguments.add(boundArgument);
+    }
+
+    return BoundFunctionCallExpression(function, arguments);
+  }
+
   BoundStatement _bindDefinitionStatement(DefinitionStatementSyntax syntax) {
     String? name = syntax.identifier.text;
     Type? type = nameToType(syntax.type.text ?? '');
@@ -163,6 +200,33 @@ final class Binder {
     }
 
     return BoundAssignmentStatement(name!, expression);
+  }
+
+  BoundStatement _bindFunctionDeclarationStatement(FunctionDeclarationStatementSyntax syntax) {
+    String? name = syntax.name.text;
+    Type? returnType = nameToType(syntax.returnType.text ?? '');
+
+    if (name == null) {
+      throw Exception("No name specified");
+    } else if (_variables.containsVariable(name)) {
+      throw Exception('Variable $name already exists');
+    }
+
+    globals[VariableSymbol(name, returnType!)] = '';
+    return BoundExpressionStatement(BoundEmptyExpression());
+  }
+
+  BoundStatement _bindFunctionDefinitionStatement(FunctionDefinitionStatementSyntax syntax) {
+    String? name = syntax.name.text;
+    Type returnType = nameToType(syntax.returnType.text ?? '')!;
+
+    if (name == null) {
+      throw Exception("No name specified");
+    }
+
+    VariableSymbol variableSymbol = globals.getVariableSymbolFromName(name) ?? VariableSymbol(name, returnType);
+    globals[variableSymbol] = FunctionContainer(returnType, syntax.parameters, syntax.body);
+    return BoundExpressionStatement(BoundEmptyExpression());
   }
 
   BoundStatement _bindBlock(BlockStatementSyntax syntax) {
@@ -204,7 +268,7 @@ final class Binder {
     }[kind];
   }
 
-  Type? nameToType(String name) {
+  static Type? nameToType(String name) {
     return {
       'int': int,
       'double': double,

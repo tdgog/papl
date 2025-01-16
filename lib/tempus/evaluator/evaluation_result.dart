@@ -5,5 +5,6 @@ class EvaluationResult {
   late final Type type;
 
   EvaluationResult(this.result, [Type? type]) : type = type ?? result.runtimeType;
+  EvaluationResult.empty() : result = Null, type = Null;
 
 }

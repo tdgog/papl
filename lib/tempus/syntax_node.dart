@@ -63,7 +63,15 @@ abstract class SyntaxNode {
       case SyntaxKind.definitionStatement:
       case SyntaxKind.assignmentStatement:
       case SyntaxKind.expressionStatement:
+      case SyntaxKind.printStatement:
+      case SyntaxKind.functionCallStatement:
+      case SyntaxKind.functionDeclarationStatement:
+      case SyntaxKind.functionDefinitionStatement:
           return AnsiColors.magenta;
+
+      case SyntaxKind.forLoop:
+      case SyntaxKind.printKeyword:
+        return AnsiColors.green;
 
       default:
         return AnsiColors.reset;

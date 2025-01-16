@@ -9,4 +9,5 @@ enum BoundNodeKind {
   block,
   printStatement,
   ifStatement,
+  functionCallExpression,
 }

@@ -88,6 +88,8 @@ class Lexer {
         return SyntaxToken(SyntaxKind.openBraceToken, _position++, '{');
       case '}':
         return SyntaxToken(SyntaxKind.closeBraceToken, _position++, '}');
+      case ',':
+        return SyntaxToken(SyntaxKind.commaToken, _position++, ',');
       case '<':
         if (_peek(1) == '=') {
           _position += 2;

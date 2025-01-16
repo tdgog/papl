@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:prototype/tempus/evaluator/evaluation_result.dart';
 import 'package:prototype/tempus/evaluator/visitors/addition_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/division_visitor.dart';
@@ -20,6 +21,7 @@ import 'package:prototype/tempus/parsing/binding/bound_empty_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_for_loop.dart';
+import 'package:prototype/tempus/parsing/binding/bound_function_call_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_if_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_node_kind.dart';
@@ -28,6 +30,7 @@ import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_variable_expression.dart';
+import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
 
@@ -82,8 +85,10 @@ class Evaluator {
         return _evaluateUnaryExpression(node as BoundUnaryExpression);
       case BoundNodeKind.binaryExpression:
         return _evaluateBinaryExpression(node as BoundBinaryExpression);
+      case BoundNodeKind.functionCallExpression:
+        return _evaluateFunctionCallExpression(node as BoundFunctionCallExpression);
       case BoundNodeKind.emptyExpression:
-        return EvaluationResult(Null, Null);
+        return EvaluationResult.empty();
       default:
         throw Exception('Unexpected node ${node.kind}');
     }
@@ -101,8 +106,30 @@ class Evaluator {
     if (result == null) {
       throw Exception('Variable ${expression.variable.name} does not exist.');
     }
-
     return EvaluationResult(result, expression.variable.type);
+  }
+
+  EvaluationResult _evaluateFunctionCallExpression(BoundFunctionCallExpression expression) {
+    // Create scope
+    VariableCollection blockVariables = VariableCollection();
+    Evaluator evaluator = Evaluator(blockVariables);
+    Binder binder = Binder(blockVariables);
+
+    // Add arguments as scope variables
+    for (final pairs in IterableZip([expression.functionContainer.parameters, expression.arguments])) {
+      ParameterSyntax parameterSyntax = pairs[0] as ParameterSyntax;
+      BoundExpressionStatement argument = BoundExpressionStatement(pairs[1] as BoundExpression);
+      Object result = _evaluateFrom(argument)!;
+      blockVariables[VariableSymbol(parameterSyntax.name, parameterSyntax.type)] = result;
+    }
+
+    // Run scope code
+    BoundStatement boundBlock = binder.bindStatement(expression.functionContainer.body);
+    evaluator._evaluateStatement(boundBlock);
+
+    // Return stuff
+
+    return EvaluationResult.empty();
   }
 
   /// Evaluates a [BoundUnaryExpression], and returns the [EvaluationResult]

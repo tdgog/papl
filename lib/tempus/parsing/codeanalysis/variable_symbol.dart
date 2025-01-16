@@ -1,4 +1,4 @@
-final class VariableSymbol {
+class VariableSymbol {
 
   final String name;
   final Type type;
@@ -8,6 +8,14 @@ final class VariableSymbol {
   @override
   String toString() {
     return 'VariableSymbol[$type $name]';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is VariableSymbol) {
+      return name == other.name && type == other.type;
+    }
+    return false;
   }
 
 }

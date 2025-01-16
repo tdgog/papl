@@ -1,3 +1,5 @@
+import 'package:prototype/tempus/parsing/binding/binder.dart';
+import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
@@ -9,6 +11,9 @@ import 'package:prototype/tempus/parsing/syntax/empty_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/for_loop_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/function_call_statement.dart';
+import 'package:prototype/tempus/parsing/syntax/function_declaration_statement_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/function_definition_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/if_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
@@ -100,6 +105,10 @@ class Parser {
             if (_peek(2).kind == SyntaxKind.equalsToken) {
               return DefinitionStatementSyntax(_nextToken(), _nextToken(), _nextToken(), _parseExpression());
             }
+            if (_peek(2).kind == SyntaxKind.openBracketToken) {
+              // Function declaration
+              return _parseFunction();
+            }
             break;
 
           // Variable assignment
@@ -122,6 +131,10 @@ class Parser {
                 )
             );
 
+          //  Function call
+          case SyntaxKind.openBracketToken:
+            return _parseFunctionCall();
+
           default:
             break;
         }
@@ -139,6 +152,40 @@ class Parser {
         default:
           return _parseExpressionStatement();
       }
+    }
+
+    StatementSyntax _parseFunction() {
+      SyntaxToken returnType = _nextToken();
+      SyntaxToken functionName = _nextToken();
+      SyntaxToken openBracket = _nextToken();
+      List<ParameterSyntax> parameters = [];
+      while (_current.kind != SyntaxKind.closeBracketToken) {
+        parameters.add(ParameterSyntax(Binder.nameToType(_nextToken().text!)!, _nextToken().text!));
+        if (_current.kind == SyntaxKind.commaToken) {
+          _nextToken();
+        }
+      }
+      SyntaxToken closeBracket = _nextToken();
+      if (_current.kind == SyntaxKind.eolToken) {
+        return FunctionDeclarationStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _nextToken());
+      } else if (_current.kind == SyntaxKind.openBraceToken) {
+        return FunctionDefinitionStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _parseScope());
+      }
+      throw Exception("Invalid function declaration");
+    }
+
+    StatementSyntax _parseFunctionCall() {
+      SyntaxToken functionName = _nextToken();
+      SyntaxToken openBracket = _nextToken();
+      List<ExpressionSyntax> arguments = [];
+      while (_current.kind != SyntaxKind.closeBracketToken) {
+        arguments.add(_parseExpression());
+        if (_current.kind == SyntaxKind.commaToken) {
+          _nextToken();
+        }
+      }
+      SyntaxToken closeBracket = _nextToken();
+      return ExpressionStatementSyntax(FunctionCallExpression(functionName, openBracket, arguments, closeBracket));
     }
 
     StatementSyntax _parseIfStatement() {

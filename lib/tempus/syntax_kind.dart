@@ -31,6 +31,7 @@ enum SyntaxKind {
   openBraceToken,
   closeBraceToken,
   identifierToken,
+  commaToken,
 
   // Expressions
   unaryExpression,
@@ -47,6 +48,9 @@ enum SyntaxKind {
   expressionStatement,
   forLoop,
   ifStatement,
+  functionDeclarationStatement,
+  functionDefinitionStatement,
+  functionCallStatement,
 
   // Keywords
   trueKeyword,

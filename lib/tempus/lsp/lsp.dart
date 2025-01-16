@@ -20,6 +20,7 @@ List<EditorColorRecord> lsp(String code) {
         colors.add(EditorColorRecord(token, EditorColorType.boolean));
 
       case SyntaxKind.forKeyword:
+      case SyntaxKind.whileKeyword:
       case SyntaxKind.printKeyword:
       case SyntaxKind.ifKeyword:
       case SyntaxKind.elseKeyword:

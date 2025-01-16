@@ -5,10 +5,12 @@ import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
 
 typedef VariableCollection = HashMap<VariableSymbol, Object>;
 
+final VariableCollection globals = VariableCollection();
+
 extension AccessVariableCollectionByName on VariableCollection {
 
   bool containsVariable(String? name) {
-    return keys.any((variable) => variable.name == name);
+    return keys.any((variable) => variable.name == name) || globals.keys.any((variable) => variable.name == name);
   }
 
   Object? getVariableValue(String? name) {
