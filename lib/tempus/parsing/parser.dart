@@ -18,6 +18,7 @@ import 'package:prototype/tempus/parsing/syntax/if_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/print_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/return_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
@@ -131,10 +132,6 @@ class Parser {
                 )
             );
 
-          //  Function call
-          case SyntaxKind.openBracketToken:
-            return _parseFunctionCall();
-
           default:
             break;
         }
@@ -149,6 +146,11 @@ class Parser {
           return _parsePrintStatement();
         case SyntaxKind.ifKeyword:
           return _parseIfStatement();
+        case SyntaxKind.returnKeyword:
+          if (_peek(1).kind == SyntaxKind.eolToken) {
+            return ReturnStatementSyntax(_nextToken(), EmptyExpressionSyntax());
+          }
+          return ReturnStatementSyntax(_nextToken(), _parseExpression());
         default:
           return _parseExpressionStatement();
       }
@@ -169,12 +171,12 @@ class Parser {
       if (_current.kind == SyntaxKind.eolToken) {
         return FunctionDeclarationStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _nextToken());
       } else if (_current.kind == SyntaxKind.openBraceToken) {
-        return FunctionDefinitionStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _parseScope());
+        return FunctionDefinitionStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _parseScope(isFunction: true));
       }
       throw Exception("Invalid function declaration");
     }
 
-    StatementSyntax _parseFunctionCall() {
+    ExpressionSyntax _parseFunctionCall() {
       SyntaxToken functionName = _nextToken();
       SyntaxToken openBracket = _nextToken();
       List<ExpressionSyntax> arguments = [];
@@ -185,7 +187,7 @@ class Parser {
         }
       }
       SyntaxToken closeBracket = _nextToken();
-      return ExpressionStatementSyntax(FunctionCallExpression(functionName, openBracket, arguments, closeBracket));
+      return FunctionCallExpression(functionName, openBracket, arguments, closeBracket);
     }
 
     StatementSyntax _parseIfStatement() {
@@ -240,7 +242,7 @@ class Parser {
           closeBracketToken, loopBlock);
     }
 
-    StatementSyntax _parseScope() {
+    StatementSyntax _parseScope({isFunction = false}) {
       SyntaxToken openBrace = _nextToken();
       List<StatementSyntax> nestedStatements = [];
       while (_current.kind != SyntaxKind.closeBraceToken) {
@@ -249,7 +251,17 @@ class Parser {
           continue;
         }
 
-        nestedStatements.add(_parseStatement());
+        StatementSyntax statement = _parseStatement();
+        if (isFunction) {
+          if (statement is FunctionDefinitionStatementSyntax) {
+            throw Exception("Cannot define functions in function scope");
+          } else if (statement is FunctionDeclarationStatementSyntax) {
+            throw Exception("Cannot declare functions in function scope");
+          }
+        } else if (statement is ReturnStatementSyntax) {
+          throw Exception("Cannot return from outside of function.");
+        }
+        nestedStatements.add(statement);
       }
       SyntaxToken closeBrace = _nextToken();
 
@@ -304,6 +316,9 @@ class Parser {
         case SyntaxKind.falseKeyword:
           return LiteralExpressionSyntax(_nextToken());
         case SyntaxKind.identifierToken:
+          if (_peek(1).kind == SyntaxKind.openBracketToken) {
+            return _parseFunctionCall();
+          }
           return NameExpressionSyntax(_nextToken());
         default:
           SyntaxToken token = _match([SyntaxKind.integerToken, SyntaxKind.floatToken]);

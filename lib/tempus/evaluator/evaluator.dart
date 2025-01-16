@@ -12,6 +12,7 @@ import 'package:prototype/tempus/evaluator/visitors/modulo_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/multiplication_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/subtraction_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/visitor.dart';
+import 'package:prototype/tempus/exceptions/return_exception.dart';
 import 'package:prototype/tempus/parsing/binding/bound_block.dart';
 import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
@@ -26,6 +27,7 @@ import 'package:prototype/tempus/parsing/binding/bound_if_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_node_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
+import 'package:prototype/tempus/parsing/binding/bound_return_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator_kind.dart';
@@ -125,10 +127,14 @@ class Evaluator {
 
     // Run scope code
     BoundStatement boundBlock = binder.bindStatement(expression.functionContainer.body);
-    evaluator._evaluateStatement(boundBlock);
+    try {
+      evaluator._evaluateStatement(boundBlock);
+    } on ReturnException catch (e) {
+      // If a return statement is hit, return the result
+      return e.result;
+    }
 
-    // Return stuff
-
+    // If no return statement is hit, return null
     return EvaluationResult.empty();
   }
 
@@ -184,6 +190,8 @@ class Evaluator {
         return _evaluatePrintStatement(node as BoundPrintStatement);
       case BoundNodeKind.ifStatement:
         return _evaluateIfStatement(node as BoundIfStatement);
+      case BoundNodeKind.returnStatement:
+        throw ReturnException(_evaluateExpression((node as BoundReturnStatement).expression));
       case BoundNodeKind.emptyExpression:
         return;
       default:

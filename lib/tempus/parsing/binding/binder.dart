@@ -10,6 +10,7 @@ import 'package:prototype/tempus/parsing/binding/bound_function_call_expression.
 import 'package:prototype/tempus/parsing/binding/bound_if_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_literal_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_print_statement.dart';
+import 'package:prototype/tempus/parsing/binding/bound_return_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator.dart';
@@ -32,6 +33,7 @@ import 'package:prototype/tempus/parsing/syntax/if_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/literal_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/name_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/print_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/return_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/unary_expression_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
@@ -61,6 +63,8 @@ final class Binder {
         return _bindPrintStatement(syntax as PrintSyntax);
       case SyntaxKind.ifStatement:
         return _bindIfStatement(syntax as IfStatementSyntax);
+      case SyntaxKind.returnStatement:
+        return _bindReturnStatement(syntax as ReturnStatementSyntax);
       default:
         return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
     }
@@ -257,6 +261,13 @@ final class Binder {
             ? BoundExpressionStatement(BoundEmptyExpression())
             : bindStatement(syntax.falseStatement!)
     );
+  }
+
+  BoundStatement _bindReturnStatement(ReturnStatementSyntax syntax) {
+    if (syntax.expression == null) {
+      return BoundReturnStatement(BoundEmptyExpression());
+    }
+    return BoundReturnStatement(_bindExpression(syntax.expression!));
   }
 
   Type? getType(SyntaxKind kind) {

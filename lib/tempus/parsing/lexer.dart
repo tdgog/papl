@@ -186,6 +186,8 @@ class Lexer {
         return SyntaxToken(SyntaxKind.elseKeyword, start, 'else');
       case "print":
         return SyntaxToken(SyntaxKind.printKeyword, start, 'print');
+      case "return":
+        return SyntaxToken(SyntaxKind.returnKeyword, start, 'return');
       default:
         return SyntaxToken(SyntaxKind.identifierToken, start, value, value);
     }

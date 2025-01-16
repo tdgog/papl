@@ -10,4 +10,5 @@ enum BoundNodeKind {
   printStatement,
   ifStatement,
   functionCallExpression,
+  returnStatement,
 }
