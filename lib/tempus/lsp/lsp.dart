@@ -7,7 +7,6 @@ List<EditorColorRecord> lsp(String code) {
 
   List<EditorColorRecord> colors = [];
   for (var token in tokens) {
-    print(token.kind);
     switch (token.kind) {
       case SyntaxKind.integerToken:
       case SyntaxKind.floatToken:

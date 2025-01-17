@@ -236,7 +236,7 @@ final class Binder {
     }
 
     VariableSymbol variableSymbol = globals.getVariableSymbolFromName(name) ?? VariableSymbol(name, returnType);
-    globals[variableSymbol] = FunctionContainer(returnType, syntax.parameters, syntax.body);
+    globals[variableSymbol] = FunctionContainer(name, returnType, syntax.parameters, syntax.body);
     return BoundExpressionStatement(BoundEmptyExpression());
   }
 

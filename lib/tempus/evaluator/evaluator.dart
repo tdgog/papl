@@ -35,6 +35,7 @@ import 'package:prototype/tempus/parsing/binding/bound_variable_expression.dart'
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
+import 'package:prototype/tempus/parsing/syntax/data_type_syntax.dart';
 
 final Map<BoundBinaryOperatorKind, Visitor> binaryOperatorVisitors = {
   BoundBinaryOperatorKind.addition: AdditionVisitor(),
@@ -130,7 +131,10 @@ class Evaluator {
     try {
       evaluator._evaluateStatement(boundBlock);
     } on ReturnException catch (e) {
-      // If a return statement is hit, return the result
+      // If a return statement is hit, return the result unless the return type is void
+      if (e.result.result.runtimeType != expression.functionContainer.returnType) {
+        throw Exception('Attempt to return ${DataType.typeToName(e.result.result.runtimeType)} from function ${expression.functionContainer.name} with return type ${DataType.typeToName(expression.functionContainer.returnType)}');
+      }
       return e.result;
     }
 

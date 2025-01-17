@@ -24,13 +24,20 @@ class DataType extends SyntaxToken {
     this.type = type;
   }
 
+  static final Map<String?, Type> _types = {
+    'int': int,
+    'double': double,
+    'bool': bool,
+    'string': String,
+    'void': Null
+  };
+
   static Type? nameToType(String name) {
-    return {
-      'int': int,
-      'double': double,
-      'bool': bool,
-      'string': String
-    }[name];
+    return _types[name];
+  }
+
+  static String? typeToName(Type type) {
+    return _types.entries.firstWhere((entry) => entry.value == type, orElse: () => const MapEntry(null, Null)).key;
   }
 
   static Type? getType(SyntaxKind kind) {

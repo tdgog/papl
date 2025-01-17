@@ -1,4 +1,3 @@
-import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
@@ -106,7 +105,11 @@ class Parser {
           if (_peek(2).kind == SyntaxKind.openBracketToken) {
             return _parseFunction();
           }
-          return DefinitionStatementSyntax(DataType.from(_nextToken()), _nextToken(), _nextToken(), _parseExpression());
+          DataType dataType = DataType.from(_nextToken());
+          if (dataType.type == Null) {
+            throw Exception("void is invalid for variable declaration");
+          }
+          return DefinitionStatementSyntax(dataType, _nextToken(), _nextToken(), _parseExpression());
         }
       }
 

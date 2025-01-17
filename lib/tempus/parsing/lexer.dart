@@ -203,6 +203,8 @@ class Lexer {
         return DataType(start, 'bool');
       case "string":
         return DataType(start, 'string');
+      case "void":
+        return DataType(start, 'void');
       default:
         return SyntaxToken(SyntaxKind.identifierToken, start, value, value);
     }
