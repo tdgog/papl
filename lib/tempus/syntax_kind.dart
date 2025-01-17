@@ -6,6 +6,7 @@ enum SyntaxKind {
   whitespaceToken,
   integerToken,
   floatToken,
+  stringToken,
   equalsToken,
   lessThanOrEqualToToken,
   lessThanToken,
@@ -32,6 +33,7 @@ enum SyntaxKind {
   closeBraceToken,
   identifierToken,
   commaToken,
+  dataTypeToken,
 
   // Expressions
   unaryExpression,

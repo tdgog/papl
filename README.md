@@ -7,10 +7,10 @@
 #### language
 - [ ] `continue` and `break` statements
 - [ ] stdlib
-- [ ] strings
+- [x] strings
 - [ ] arrays
 - [ ] void
-- [ ] switch type system to only accept `int` `float` `bool` `string` `[]` `void` instead of anything
+- [x] switch type system to only accept `int` `float` `bool` `string` `[]` `void` instead of anything
 
 #### game
 - [ ] grid

@@ -53,6 +53,7 @@ abstract class SyntaxNode {
       case SyntaxKind.trueKeyword:
       case SyntaxKind.identifierToken:
       case SyntaxKind.floatToken:
+      case SyntaxKind.stringToken:
         return AnsiColors.cyan;
 
       case SyntaxKind.plusToken:
@@ -97,6 +98,7 @@ abstract class SyntaxNode {
       case SyntaxKind.printKeyword:
       case SyntaxKind.whileKeyword:
       case SyntaxKind.forKeyword:
+      case SyntaxKind.dataTypeToken:
         return AnsiColors.green;
 
       default:

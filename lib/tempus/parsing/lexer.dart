@@ -1,3 +1,4 @@
+import 'package:prototype/tempus/parsing/syntax/data_type_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
@@ -90,6 +91,8 @@ class Lexer {
         return SyntaxToken(SyntaxKind.closeBraceToken, _position++, '}');
       case ',':
         return SyntaxToken(SyntaxKind.commaToken, _position++, ',');
+      case '"':
+        return _lexString();
       case '<':
         if (_peek(1) == '=') {
           _position += 2;
@@ -192,9 +195,55 @@ class Lexer {
         return SyntaxToken(SyntaxKind.breakKeyword, start, 'break');
       case "continue":
         return SyntaxToken(SyntaxKind.continueKeyword, start, 'continue');
+      case "int":
+        return DataType(start, 'int');
+      case "double":
+        return DataType(start, 'double');
+      case "bool":
+        return DataType(start, 'bool');
+      case "string":
+        return DataType(start, 'string');
       default:
         return SyntaxToken(SyntaxKind.identifierToken, start, value, value);
     }
+  }
+
+  SyntaxToken _lexString() {
+    int start = _position;
+    _position++; // Skip the opening quote
+    StringBuffer value = StringBuffer();
+
+    while (_currentCharacter != '"' && _currentCharacter != '\x00') {
+      if (_currentCharacter == '\\') {
+        _position++;
+        switch (_currentCharacter) {
+          case 'n':
+            value.write('\n');
+            break;
+          case 't':
+            value.write('\t');
+            break;
+          case 'r':
+            value.write('\r');
+            break;
+          case '"':
+            value.write('"');
+            break;
+          case '\\':
+            value.write('\\');
+            break;
+          default:
+            value.write(_currentCharacter);
+            break;
+        }
+      } else {
+        value.write(_currentCharacter);
+      }
+      _position++;
+    }
+
+    _position++; // Skip the closing quote
+    return SyntaxToken(SyntaxKind.stringToken, start, value.toString(), value.toString());
   }
 
   bool _isDigit(String s) => s.length == 1 && "0123456789".contains(s);

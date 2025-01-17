@@ -1,4 +1,5 @@
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
+import 'package:prototype/tempus/parsing/syntax/data_type_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_node.dart';
@@ -6,7 +7,7 @@ import 'package:prototype/tempus/syntax_token.dart';
 
 class FunctionDeclarationStatementSyntax extends StatementSyntax {
 
-  SyntaxToken returnType;
+  DataType returnType;
   SyntaxToken name;
   SyntaxToken openBracket;
   List<ParameterSyntax> parameters;

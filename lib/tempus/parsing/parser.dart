@@ -8,6 +8,7 @@ import 'package:prototype/tempus/parsing/syntax/break_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/compilation_unit_syntax.dart';
 import 'package:prototype/tempus/parsing/lexer.dart';
 import 'package:prototype/tempus/parsing/syntax/continue_statement_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/data_type_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/empty_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
@@ -100,20 +101,18 @@ class Parser {
         return _parseScope();
       }
 
+      if (_current.kind == SyntaxKind.dataTypeToken) {
+        if (_peek(1).kind == SyntaxKind.identifierToken) {
+          if (_peek(2).kind == SyntaxKind.openBracketToken) {
+            return _parseFunction();
+          }
+          return DefinitionStatementSyntax(DataType.from(_nextToken()), _nextToken(), _nextToken(), _parseExpression());
+        }
+      }
+
       if (_current.kind == SyntaxKind.identifierToken) {
         SyntaxKind nextKind = _peek(1).kind;
         switch(nextKind) {
-          // Variable declaration
-          case SyntaxKind.identifierToken:
-            if (_peek(2).kind == SyntaxKind.equalsToken) {
-              return DefinitionStatementSyntax(_nextToken(), _nextToken(), _nextToken(), _parseExpression());
-            }
-            if (_peek(2).kind == SyntaxKind.openBracketToken) {
-              // Function declaration
-              return _parseFunction();
-            }
-            break;
-
           // Variable assignment
           case SyntaxKind.equalsToken:
             return AssignmentStatementSyntax(_nextToken(), _nextToken(), _parseExpression());
@@ -168,16 +167,16 @@ class Parser {
       SyntaxToken openBracket = _nextToken();
       List<ParameterSyntax> parameters = [];
       while (_current.kind != SyntaxKind.closeBracketToken) {
-        parameters.add(ParameterSyntax(Binder.nameToType(_nextToken().text!)!, _nextToken().text!));
+        parameters.add(ParameterSyntax(DataType.nameToType(_nextToken().text!)!, _nextToken().text!));
         if (_current.kind == SyntaxKind.commaToken) {
           _nextToken();
         }
       }
       SyntaxToken closeBracket = _nextToken();
       if (_current.kind == SyntaxKind.eolToken) {
-        return FunctionDeclarationStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _nextToken());
+        return FunctionDeclarationStatementSyntax(DataType.from(returnType), functionName, openBracket, parameters, closeBracket, _nextToken());
       } else if (_current.kind == SyntaxKind.openBraceToken) {
-        return FunctionDefinitionStatementSyntax(returnType, functionName, openBracket, parameters, closeBracket, _parseScope(isFunction: true));
+        return FunctionDefinitionStatementSyntax(DataType.from(returnType), functionName, openBracket, parameters, closeBracket, _parseScope(isFunction: true));
       }
       throw Exception("Invalid function declaration");
     }
@@ -326,6 +325,8 @@ class Parser {
             return _parseFunctionCall();
           }
           return NameExpressionSyntax(_nextToken());
+        case SyntaxKind.stringToken:
+          return LiteralExpressionSyntax(_nextToken());
         default:
           SyntaxToken token = _match([SyntaxKind.integerToken, SyntaxKind.floatToken]);
           switch (token.kind) {

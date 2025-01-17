@@ -7,10 +7,14 @@ List<EditorColorRecord> lsp(String code) {
 
   List<EditorColorRecord> colors = [];
   for (var token in tokens) {
+    print(token.kind);
     switch (token.kind) {
       case SyntaxKind.integerToken:
       case SyntaxKind.floatToken:
         colors.add(EditorColorRecord(token, EditorColorType.number));
+
+      case SyntaxKind.stringToken:
+        colors.add(EditorColorRecord(token, EditorColorType.string));
 
       case SyntaxKind.identifierToken:
         colors.add(EditorColorRecord(token, EditorColorType.identifier));
@@ -24,6 +28,8 @@ List<EditorColorRecord> lsp(String code) {
       case SyntaxKind.printKeyword:
       case SyntaxKind.ifKeyword:
       case SyntaxKind.elseKeyword:
+      case SyntaxKind.returnKeyword:
+      case SyntaxKind.dataTypeToken:
         colors.add(EditorColorRecord(token, EditorColorType.keyword));
 
       default:

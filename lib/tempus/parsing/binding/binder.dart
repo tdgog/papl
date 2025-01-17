@@ -21,6 +21,7 @@ import 'package:prototype/tempus/parsing/codeanalysis/function.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
 import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/data_type_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
@@ -102,7 +103,7 @@ final class Binder {
   }
 
   BoundExpression _bindLiteralExpression(LiteralExpressionSyntax syntax) {
-    Type? type = getType(syntax.children!.first.kind);
+    Type? type = DataType.getType(syntax.children!.first.kind);
 
     if (type == null) {
       throw Exception('Unexpected literal type ${syntax.kind}');
@@ -181,7 +182,7 @@ final class Binder {
 
   BoundStatement _bindDefinitionStatement(DefinitionStatementSyntax syntax) {
     String? name = syntax.identifier.text;
-    Type? type = nameToType(syntax.type.text ?? '');
+    Type? type = DataType.nameToType(syntax.type.text ?? '');
     BoundExpression expression = _bindExpression(syntax.expression);
 
     if (name == null) {
@@ -214,7 +215,7 @@ final class Binder {
 
   BoundStatement _bindFunctionDeclarationStatement(FunctionDeclarationStatementSyntax syntax) {
     String? name = syntax.name.text;
-    Type? returnType = nameToType(syntax.returnType.text ?? '');
+    Type? returnType = DataType.nameToType(syntax.returnType.text ?? '');
 
     if (name == null) {
       throw Exception("No name specified");
@@ -228,7 +229,7 @@ final class Binder {
 
   BoundStatement _bindFunctionDefinitionStatement(FunctionDefinitionStatementSyntax syntax) {
     String? name = syntax.name.text;
-    Type returnType = nameToType(syntax.returnType.text ?? '')!;
+    Type returnType = DataType.nameToType(syntax.returnType.text ?? '')!;
 
     if (name == null) {
       throw Exception("No name specified");
@@ -274,23 +275,6 @@ final class Binder {
       return BoundReturnStatement(BoundEmptyExpression());
     }
     return BoundReturnStatement(_bindExpression(syntax.expression!));
-  }
-
-  Type? getType(SyntaxKind kind) {
-    return {
-      SyntaxKind.integerToken: int,
-      SyntaxKind.floatToken: double,
-      SyntaxKind.trueKeyword: bool,
-      SyntaxKind.falseKeyword: bool
-    }[kind];
-  }
-
-  static Type? nameToType(String name) {
-    return {
-      'int': int,
-      'double': double,
-      'bool': bool,
-    }[name];
   }
 
 }
