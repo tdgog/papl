@@ -52,6 +52,8 @@ enum SyntaxKind {
   functionDefinitionStatement,
   functionCallStatement,
   returnStatement,
+  breakStatement,
+  continueStatement,
 
   // Keywords
   trueKeyword,
@@ -61,6 +63,8 @@ enum SyntaxKind {
   ifKeyword,
   elseKeyword,
   returnKeyword,
+  breakKeyword,
+  continueKeyword,
 
   compilationUnit,
 

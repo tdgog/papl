@@ -2,6 +2,8 @@ import 'package:prototype/tempus/parsing/binding/bound_block.dart';
 import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
+import 'package:prototype/tempus/parsing/binding/bound_break_statement.dart';
+import 'package:prototype/tempus/parsing/binding/bound_continue_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_empty_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
@@ -65,6 +67,10 @@ final class Binder {
         return _bindIfStatement(syntax as IfStatementSyntax);
       case SyntaxKind.returnStatement:
         return _bindReturnStatement(syntax as ReturnStatementSyntax);
+      case SyntaxKind.continueStatement:
+        return BoundContinueStatement();
+      case SyntaxKind.breakStatement:
+        return BoundBreakStatement();
       default:
         return _bindExpressionStatement(syntax as ExpressionStatementSyntax);
     }

@@ -4,8 +4,10 @@ import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dar
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/bracket_expression_syntax.dart';
+import 'package:prototype/tempus/parsing/syntax/break_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/compilation_unit_syntax.dart';
 import 'package:prototype/tempus/parsing/lexer.dart';
+import 'package:prototype/tempus/parsing/syntax/continue_statement_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/definition_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/empty_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/expression_statement_syntax.dart';
@@ -151,6 +153,10 @@ class Parser {
             return ReturnStatementSyntax(_nextToken(), EmptyExpressionSyntax());
           }
           return ReturnStatementSyntax(_nextToken(), _parseExpression());
+        case SyntaxKind.breakKeyword:
+          return BreakStatementSyntax(_nextToken());
+        case SyntaxKind.continueKeyword:
+          return ContinueStatementSyntax(_nextToken());
         default:
           return _parseExpressionStatement();
       }
