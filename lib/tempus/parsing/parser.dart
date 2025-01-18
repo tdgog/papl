@@ -82,8 +82,7 @@ class Parser {
     CompilationUnitSyntax parseCompilationUnit() {
       List<StatementSyntax> lines = [];
 
-      int i = 0;
-      while (_peek(1).kind != SyntaxKind.eofToken && i++ != 15) {
+      while (_peek(1).kind != SyntaxKind.eofToken) {
         if (_current.kind == SyntaxKind.eolToken) {
           _nextToken();
           continue;

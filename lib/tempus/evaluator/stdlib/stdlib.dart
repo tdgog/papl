@@ -1,3 +1,5 @@
+import 'package:prototype/main.dart';
+import 'package:prototype/components/grid.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/function.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
@@ -14,7 +16,13 @@ class StandardLibrary {
   }
 
   static void move(String direction) {
-    print("Moving $direction");
+    print("moving $direction");
+    gridKey.currentState?.move({
+      "up": Direction.up,
+      "down": Direction.down,
+      "left": Direction.left,
+      "right": Direction.right
+    }[direction] ?? Direction.reset);
   }
 
 }
