@@ -33,6 +33,7 @@ import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_expression.dart';
 import 'package:prototype/tempus/parsing/binding/bound_unary_operator_kind.dart';
 import 'package:prototype/tempus/parsing/binding/bound_variable_expression.dart';
+import 'package:prototype/tempus/parsing/codeanalysis/function.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_symbol.dart';
@@ -114,6 +115,14 @@ class Evaluator {
   }
 
   EvaluationResult _evaluateFunctionCallExpression(BoundFunctionCallExpression expression) {
+    // If the function is a built-in function, evaluate it
+    if (expression.functionContainer is StandardLibraryFunctionContainer) {
+      StandardLibraryFunctionContainer functionContainer = expression.functionContainer as StandardLibraryFunctionContainer;
+      List<Object> arguments = expression.arguments.map((arg) => _evaluateExpression(arg).result).toList();
+      return EvaluationResult(Function.apply(functionContainer.handler, arguments) ?? Null);
+    }
+
+    // If the function is no built-in function, evaluate it as a user-defined function
     // Create scope
     VariableCollection blockVariables = VariableCollection();
     Evaluator evaluator = Evaluator(blockVariables);
@@ -128,7 +137,7 @@ class Evaluator {
     }
 
     // Run scope code
-    BoundStatement boundBlock = binder.bindStatement(expression.functionContainer.body);
+    BoundStatement boundBlock = binder.bindStatement((expression.functionContainer as UserDefinedFunctionContainer).body);
     try {
       evaluator._evaluateStatement(boundBlock);
     } on ReturnException catch (e) {

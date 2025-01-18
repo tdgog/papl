@@ -1,4 +1,5 @@
 import 'package:prototype/tempus/evaluator/evaluator.dart';
+import 'package:prototype/tempus/evaluator/stdlib/stdlib.dart';
 import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
 import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
@@ -19,6 +20,10 @@ List<String> interpretString(String code) {
 
     BoundBinaryOperator.initialize();
   }
+
+  // Add standard library functions
+  globals.clear();
+  StandardLibrary.initialize();
 
   SyntaxTree tree = SyntaxTree(code);
   tree.printTree();

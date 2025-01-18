@@ -1,13 +1,35 @@
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
-import 'package:prototype/tempus/parsing/syntax/statement_syntax.dart';
 
-class FunctionContainer {
+import '../syntax/statement_syntax.dart';
 
-  final String name;
-  final Type returnType;
-  final List<ParameterSyntax> parameters;
+sealed class FunctionContainer {
+
+  late final String name;
+  late final Type returnType;
+  late final List<ParameterSyntax> parameters;
+
+}
+
+class UserDefinedFunctionContainer extends FunctionContainer {
+
   final StatementSyntax body;
 
-  FunctionContainer(this.name, this.returnType, this.parameters, this.body);
+  UserDefinedFunctionContainer(String name, Type returnType, List<ParameterSyntax> parameters, this.body) {
+    this.name = name;
+    this.returnType = returnType;
+    this.parameters = parameters;
+  }
+
+}
+
+class StandardLibraryFunctionContainer extends FunctionContainer {
+
+  final Function handler;
+
+  StandardLibraryFunctionContainer(String name, Type returnType, List<ParameterSyntax> parameters, this.handler) {
+    this.name = name;
+    this.returnType = returnType;
+    this.parameters = parameters;
+  }
 
 }
