@@ -28,6 +28,8 @@ List<EditorColorRecord> lsp(String code) {
       case SyntaxKind.ifKeyword:
       case SyntaxKind.elseKeyword:
       case SyntaxKind.returnKeyword:
+      case SyntaxKind.breakKeyword:
+      case SyntaxKind.continueKeyword:
       case SyntaxKind.dataTypeToken:
         colors.add(EditorColorRecord(token, EditorColorType.keyword));
 

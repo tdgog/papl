@@ -12,6 +12,7 @@ import 'package:prototype/tempus/evaluator/visitors/modulo_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/multiplication_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/subtraction_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/visitor.dart';
+import 'package:prototype/tempus/exceptions/loop_exceptions.dart';
 import 'package:prototype/tempus/exceptions/return_exception.dart';
 import 'package:prototype/tempus/parsing/binding/bound_block.dart';
 import 'package:prototype/tempus/parsing/binding/binder.dart';
@@ -196,6 +197,10 @@ class Evaluator {
         return _evaluateIfStatement(node as BoundIfStatement);
       case BoundNodeKind.returnStatement:
         throw ReturnException(_evaluateExpression((node as BoundReturnStatement).expression));
+      case BoundNodeKind.breakStatement:
+        throw BreakException();
+      case BoundNodeKind.continueStatement:
+        throw ContinueException();
       case BoundNodeKind.emptyExpression:
         return;
       default:
@@ -234,7 +239,13 @@ class Evaluator {
       evaluator._evaluateExpression(boundStartIterationCheck).result as bool;
       evaluator._evaluateStatement(boundAfterIterationStatement)
     ) {
-      evaluator._evaluateStatement(boundLoopBlock);
+      try {
+        evaluator._evaluateStatement(boundLoopBlock);
+      } on BreakException {
+        break;
+      } on ContinueException {
+        continue;
+      }
     }
 
     variables.updateAll((key, _) => blockVariables[key]!);
@@ -243,8 +254,13 @@ class Evaluator {
   /// Creates and evaluates a scope
   void _evaluateBlock(BoundBlock expression) {
     VariableCollection blockVariables = VariableCollection.from(variables);
-    for (BoundStatement statement in expression.statements) {
-      Evaluator(blockVariables, statement).evaluate();
+    try {
+      for (BoundStatement statement in expression.statements) {
+        Evaluator(blockVariables, statement).evaluate();
+      }
+    } on LoopException {
+      variables.updateAll((key, _) => blockVariables[key]!);
+      rethrow;
     }
     variables.updateAll((key, _) => blockVariables[key]!);
   }

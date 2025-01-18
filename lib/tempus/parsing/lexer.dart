@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:prototype/tempus/parsing/syntax/data_type_syntax.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_token.dart';
@@ -245,6 +247,7 @@ class Lexer {
     }
 
     _position++; // Skip the closing quote
+    _position = min(_position, _text.length);
     return SyntaxToken(SyntaxKind.stringToken, start, value.toString(), value.toString());
   }
 

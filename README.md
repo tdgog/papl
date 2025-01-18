@@ -5,11 +5,11 @@
 
 ## TODO
 #### language
-- [ ] `continue` and `break` statements
+- [x] `continue` and `break` statements
 - [ ] stdlib
 - [x] strings
 - [ ] arrays
-- [ ] void
+- [x] void
 - [x] switch type system to only accept `int` `float` `bool` `string` `[]` `void` instead of anything
 
 #### game
@@ -21,3 +21,4 @@
 - [ ] a few crops
 - [ ] an upgrade tree
 - [ ] save to external db
+  
