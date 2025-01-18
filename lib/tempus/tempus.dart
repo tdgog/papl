@@ -13,7 +13,7 @@ import 'syntax_tree.dart';
 
 bool _isInitialized = false;
 
-List<String> interpretString(String code) {
+Future<List<String>> interpretString(String code) async {
   // Some areas need to be initialized the first time the interpreter runs
   if (!_isInitialized) {
     _isInitialized = true;
@@ -28,11 +28,11 @@ List<String> interpretString(String code) {
   SyntaxTree tree = SyntaxTree(code);
   tree.printTree();
 
-  List<String> output = _interpretLines(tree.root.lines);
+  List<String> output = await _interpretLines(tree.root.lines);
   return output;
 }
 
-List<String> _interpretLines(List<StatementSyntax> lines, {VariableCollection? previous}) {
+Future<List<String>> _interpretLines(List<StatementSyntax> lines, {VariableCollection? previous}) async {
   VariableCollection variables = VariableCollection.from(previous ?? {});
   Binder binder = Binder(variables);
 
@@ -48,7 +48,7 @@ List<String> _interpretLines(List<StatementSyntax> lines, {VariableCollection? p
         }
       }
 
-      List<String> nestedOutput = _interpretLines(statements, previous: variables);
+      List<String> nestedOutput = await _interpretLines(statements, previous: variables);
       output.addAll(nestedOutput);
 
       continue;
@@ -56,7 +56,7 @@ List<String> _interpretLines(List<StatementSyntax> lines, {VariableCollection? p
 
     BoundStatement boundStatement = binder.bindStatement(expression);
     Evaluator evaluator = Evaluator(variables, boundStatement);
-    var result = evaluator.evaluate();
+    var result = await evaluator.evaluate();
 
     if (boundStatement is BoundExpressionStatement) {
       output.add("$result");

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:prototype/data.dart';
 import 'package:prototype/tempus/evaluator/evaluation_result.dart';
 import 'package:prototype/tempus/evaluator/visitors/addition_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/division_visitor.dart';
@@ -62,7 +63,7 @@ class Evaluator {
   Evaluator(this.variables, [this.root]);
 
   /// Evaluates the bound tree from the root and returns the result
-  Object? evaluate() {
+  Future<Object?> evaluate() async {
     if (root == null) {
       throw Exception("Attempt to evaluate from null root");
     }
@@ -71,16 +72,18 @@ class Evaluator {
   }
 
   /// Evaluates the bound tree from the given [BoundStatement] and returns the result
-  Object? _evaluateFrom(BoundStatement from) {
+  Future<Object?> _evaluateFrom(BoundStatement from) async {
     if (from is BoundExpressionStatement) {
-      return _evaluateExpression(from.expression).result;
+      return (await _evaluateExpression(from.expression)).result;
     }
     _evaluateStatement(from);
     return null;
   }
 
   /// Evaluates the given [BoundExpression] and returns the result
-  EvaluationResult _evaluateExpression(BoundExpression node) {
+  Future<EvaluationResult> _evaluateExpression(BoundExpression node) async {
+    await Future.delayed(GameData.expressionExecutionTime);
+
     switch (node.kind) {
       case BoundNodeKind.literalExpression:
         return _evaluateLiteralExpression(node as BoundLiteralExpression);
@@ -114,11 +117,14 @@ class Evaluator {
     return EvaluationResult(result, expression.variable.type);
   }
 
-  EvaluationResult _evaluateFunctionCallExpression(BoundFunctionCallExpression expression) {
+  Future<EvaluationResult> _evaluateFunctionCallExpression(BoundFunctionCallExpression expression) async {
     // If the function is a built-in function, evaluate it
     if (expression.functionContainer is StandardLibraryFunctionContainer) {
       StandardLibraryFunctionContainer functionContainer = expression.functionContainer as StandardLibraryFunctionContainer;
-      List<Object> arguments = expression.arguments.map((arg) => _evaluateExpression(arg).result).toList();
+      List<Object> arguments = [];
+      for (var arg in expression.arguments) {
+        arguments.add((await _evaluateExpression(arg)).result);
+    }
       return EvaluationResult(Function.apply(functionContainer.handler, arguments) ?? Null);
     }
 
@@ -132,7 +138,7 @@ class Evaluator {
     for (final pairs in IterableZip([expression.functionContainer.parameters, expression.arguments])) {
       ParameterSyntax parameterSyntax = pairs[0] as ParameterSyntax;
       BoundExpressionStatement argument = BoundExpressionStatement(pairs[1] as BoundExpression);
-      Object result = _evaluateFrom(argument)!;
+      Object result = _evaluateFrom(argument);
       blockVariables[VariableSymbol(parameterSyntax.name, parameterSyntax.type)] = result;
     }
 
@@ -153,8 +159,8 @@ class Evaluator {
   }
 
   /// Evaluates a [BoundUnaryExpression], and returns the [EvaluationResult]
-  EvaluationResult _evaluateUnaryExpression(BoundUnaryExpression expression) {
-    EvaluationResult operand = _evaluateExpression(expression.operand);
+  Future<EvaluationResult> _evaluateUnaryExpression(BoundUnaryExpression expression) async {
+    EvaluationResult operand = await _evaluateExpression(expression.operand);
     BoundUnaryOperatorKind operatorKind = expression.operator.operatorKind;
 
     if (operatorKind == BoundUnaryOperatorKind.identity) {
@@ -173,9 +179,9 @@ class Evaluator {
   }
 
   /// Evaluates a [BoundBinaryExpression], and returns the [EvaluationResult]
-  EvaluationResult _evaluateBinaryExpression(BoundBinaryExpression expression) {
-    EvaluationResult left = _evaluateExpression(expression.left);
-    EvaluationResult right = _evaluateExpression(expression.right);
+  Future<EvaluationResult> _evaluateBinaryExpression(BoundBinaryExpression expression) async {
+    EvaluationResult left = await _evaluateExpression(expression.left);
+    EvaluationResult right = await _evaluateExpression(expression.right);
     BoundBinaryOperatorKind operatorKind = expression.operator.operatorKind;
 
     if (operatorKind == BoundBinaryOperatorKind.equals) {
@@ -192,7 +198,7 @@ class Evaluator {
   }
 
   /// Evaluates a [BoundStatement]
-  void _evaluateStatement(BoundStatement node) {
+  Future<void> _evaluateStatement(BoundStatement node) async {
     switch (node.kind) {
       case BoundNodeKind.assignmentStatement:
         return _evaluateAssignmentStatement(node as BoundAssignmentStatement);
@@ -205,7 +211,7 @@ class Evaluator {
       case BoundNodeKind.ifStatement:
         return _evaluateIfStatement(node as BoundIfStatement);
       case BoundNodeKind.returnStatement:
-        throw ReturnException(_evaluateExpression((node as BoundReturnStatement).expression));
+        throw ReturnException(await _evaluateExpression((node as BoundReturnStatement).expression));
       case BoundNodeKind.breakStatement:
         throw BreakException();
       case BoundNodeKind.continueStatement:
@@ -218,8 +224,8 @@ class Evaluator {
   }
 
   /// Assigns a variable
-  void _evaluateAssignmentStatement(BoundAssignmentStatement expression) {
-    EvaluationResult value = _evaluateExpression(expression.expression);
+  void _evaluateAssignmentStatement(BoundAssignmentStatement expression) async {
+    EvaluationResult value = await _evaluateExpression(expression.expression);
     VariableSymbol symbol = variables.getVariableSymbolFromName(expression.name)
         ?? VariableSymbol(expression.name, expression.type);
 
@@ -227,7 +233,7 @@ class Evaluator {
   }
 
   /// Runs a for loop, also used for while loops
-  void _evaluateForLoop(BoundForLoop expression) {
+  void _evaluateForLoop(BoundForLoop expression) async {
     // Set up new evaluator to keep for loop variables scoped properly
     VariableCollection blockVariables = VariableCollection.from(variables);
     Evaluator evaluator = Evaluator(blockVariables);
@@ -245,7 +251,7 @@ class Evaluator {
 
     for (
       ;
-      evaluator._evaluateExpression(boundStartIterationCheck).result as bool;
+      (await evaluator._evaluateExpression(boundStartIterationCheck)).result as bool;
       evaluator._evaluateStatement(boundAfterIterationStatement)
     ) {
       try {
@@ -275,13 +281,13 @@ class Evaluator {
   }
 
   /// Evaluates print statements
-  void _evaluatePrintStatement(BoundPrintStatement statement) {
-    print(_evaluateExpression(statement.expression).result);
+  void _evaluatePrintStatement(BoundPrintStatement statement) async {
+    print((await _evaluateExpression(statement.expression)).result);
   }
 
   /// Evaluates if/else statements
-  void _evaluateIfStatement(BoundIfStatement statement) {
-    if (_evaluateExpression(statement.condition.expression).result as bool) {
+  void _evaluateIfStatement(BoundIfStatement statement) async {
+    if ((await _evaluateExpression(statement.condition.expression)).result as bool) {
       _evaluateFrom(statement.trueStatement);
     } else {
       // If there is no else statement, move on

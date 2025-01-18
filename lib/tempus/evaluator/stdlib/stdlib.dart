@@ -16,7 +16,6 @@ class StandardLibrary {
   }
 
   static void move(String direction) {
-    print("moving $direction");
     gridKey.currentState?.move({
       "up": Direction.up,
       "down": Direction.down,
