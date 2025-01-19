@@ -68,7 +68,7 @@ class Evaluator {
       throw Exception("Attempt to evaluate from null root");
     }
 
-    return _evaluateFrom(root!);
+    return await _evaluateFrom(root!);
   }
 
   /// Evaluates the bound tree from the given [BoundStatement] and returns the result
@@ -76,7 +76,7 @@ class Evaluator {
     if (from is BoundExpressionStatement) {
       return (await _evaluateExpression(from.expression)).result;
     }
-    _evaluateStatement(from);
+    await _evaluateStatement(from);
     return null;
   }
 
@@ -90,11 +90,11 @@ class Evaluator {
       case BoundNodeKind.variableExpression:
         return _evaluateVariableExpression(node as BoundVariableExpression);
       case BoundNodeKind.unaryExpression:
-        return _evaluateUnaryExpression(node as BoundUnaryExpression);
+        return await _evaluateUnaryExpression(node as BoundUnaryExpression);
       case BoundNodeKind.binaryExpression:
-        return _evaluateBinaryExpression(node as BoundBinaryExpression);
+        return await _evaluateBinaryExpression(node as BoundBinaryExpression);
       case BoundNodeKind.functionCallExpression:
-        return _evaluateFunctionCallExpression(node as BoundFunctionCallExpression);
+        return await _evaluateFunctionCallExpression(node as BoundFunctionCallExpression);
       case BoundNodeKind.emptyExpression:
         return EvaluationResult.empty();
       default:
@@ -138,14 +138,14 @@ class Evaluator {
     for (final pairs in IterableZip([expression.functionContainer.parameters, expression.arguments])) {
       ParameterSyntax parameterSyntax = pairs[0] as ParameterSyntax;
       BoundExpressionStatement argument = BoundExpressionStatement(pairs[1] as BoundExpression);
-      Object result = _evaluateFrom(argument);
+      Object result = (await _evaluateFrom(argument))!;
       blockVariables[VariableSymbol(parameterSyntax.name, parameterSyntax.type)] = result;
     }
 
     // Run scope code
     BoundStatement boundBlock = binder.bindStatement((expression.functionContainer as UserDefinedFunctionContainer).body);
     try {
-      evaluator._evaluateStatement(boundBlock);
+      await evaluator._evaluateStatement(boundBlock);
     } on ReturnException catch (e) {
       // If a return statement is hit, return the result unless the return type is void
       if (e.result.result.runtimeType != expression.functionContainer.returnType) {
@@ -201,15 +201,15 @@ class Evaluator {
   Future<void> _evaluateStatement(BoundStatement node) async {
     switch (node.kind) {
       case BoundNodeKind.assignmentStatement:
-        return _evaluateAssignmentStatement(node as BoundAssignmentStatement);
+        return await _evaluateAssignmentStatement(node as BoundAssignmentStatement);
       case BoundNodeKind.forLoop:
-        return _evaluateForLoop(node as BoundForLoop);
+        return await _evaluateForLoop(node as BoundForLoop);
       case BoundNodeKind.block:
-        return _evaluateBlock(node as BoundBlock);
+        return await _evaluateBlock(node as BoundBlock);
       case BoundNodeKind.printStatement:
-        return _evaluatePrintStatement(node as BoundPrintStatement);
+        return await _evaluatePrintStatement(node as BoundPrintStatement);
       case BoundNodeKind.ifStatement:
-        return _evaluateIfStatement(node as BoundIfStatement);
+        return await _evaluateIfStatement(node as BoundIfStatement);
       case BoundNodeKind.returnStatement:
         throw ReturnException(await _evaluateExpression((node as BoundReturnStatement).expression));
       case BoundNodeKind.breakStatement:
@@ -224,7 +224,7 @@ class Evaluator {
   }
 
   /// Assigns a variable
-  void _evaluateAssignmentStatement(BoundAssignmentStatement expression) async {
+  Future<void> _evaluateAssignmentStatement(BoundAssignmentStatement expression) async {
     EvaluationResult value = await _evaluateExpression(expression.expression);
     VariableSymbol symbol = variables.getVariableSymbolFromName(expression.name)
         ?? VariableSymbol(expression.name, expression.type);
@@ -233,7 +233,7 @@ class Evaluator {
   }
 
   /// Runs a for loop, also used for while loops
-  void _evaluateForLoop(BoundForLoop expression) async {
+  Future<void> _evaluateForLoop(BoundForLoop expression) async {
     // Set up new evaluator to keep for loop variables scoped properly
     VariableCollection blockVariables = VariableCollection.from(variables);
     Evaluator evaluator = Evaluator(blockVariables);
@@ -242,7 +242,7 @@ class Evaluator {
 
     // Bind and execute the first statement
     BoundStatement boundPreLoopStatement = binder.bindStatement(expression.preLoopStatement);
-    evaluator._evaluateStatement(boundPreLoopStatement);
+    await evaluator._evaluateStatement(boundPreLoopStatement);
 
     // Bind the other statements
     BoundExpression boundStartIterationCheck = (binder.bindStatement(expression.startIterationCheck) as BoundExpressionStatement).expression;
@@ -252,10 +252,10 @@ class Evaluator {
     for (
       ;
       (await evaluator._evaluateExpression(boundStartIterationCheck)).result as bool;
-      evaluator._evaluateStatement(boundAfterIterationStatement)
+      await evaluator._evaluateStatement(boundAfterIterationStatement)
     ) {
       try {
-        evaluator._evaluateStatement(boundLoopBlock);
+        await evaluator._evaluateStatement(boundLoopBlock);
       } on BreakException {
         break;
       } on ContinueException {
@@ -267,11 +267,11 @@ class Evaluator {
   }
 
   /// Creates and evaluates a scope
-  void _evaluateBlock(BoundBlock expression) {
+  Future<void> _evaluateBlock(BoundBlock expression) async {
     VariableCollection blockVariables = VariableCollection.from(variables);
     try {
       for (BoundStatement statement in expression.statements) {
-        Evaluator(blockVariables, statement).evaluate();
+        await Evaluator(blockVariables, statement).evaluate();
       }
     } on LoopException {
       variables.updateAll((key, _) => blockVariables[key]!);
@@ -281,14 +281,14 @@ class Evaluator {
   }
 
   /// Evaluates print statements
-  void _evaluatePrintStatement(BoundPrintStatement statement) async {
+  Future<void> _evaluatePrintStatement(BoundPrintStatement statement) async {
     print((await _evaluateExpression(statement.expression)).result);
   }
 
   /// Evaluates if/else statements
-  void _evaluateIfStatement(BoundIfStatement statement) async {
+  Future<void> _evaluateIfStatement(BoundIfStatement statement) async {
     if ((await _evaluateExpression(statement.condition.expression)).result as bool) {
-      _evaluateFrom(statement.trueStatement);
+      await _evaluateFrom(statement.trueStatement);
     } else {
       // If there is no else statement, move on
       if (statement.falseStatement is BoundExpressionStatement) {
@@ -297,7 +297,7 @@ class Evaluator {
         }
       }
 
-      _evaluateFrom(statement.falseStatement);
+      await _evaluateFrom(statement.falseStatement);
     }
   }
 
