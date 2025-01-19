@@ -7,7 +7,7 @@ class GameData {
   // User data
   static int sizeX = 4;
   static int sizeY = 4;
-  static Duration expressionExecutionTime = const Duration(milliseconds: 800);
+  static Duration expressionExecutionTime = const Duration(milliseconds: 150);
   static Map<String, int> resources = {
     "red_bubble_fragment": 0,
     "blue_plate_fragment": 0,
