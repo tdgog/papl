@@ -2,11 +2,15 @@ library coral;
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-part 'basic_coral.dart';
+import 'package:prototype/data.dart';
+part 'red_bubble.dart';
+part 'blue_plate.dart';
 
 abstract class Coral {
 
-  /// Harvestable at age 5
+  static Random random = Random();
+
+  /// Harvestable at age 4
   int _age = 0;
   final int x;
   final int y;
@@ -20,6 +24,7 @@ abstract class Coral {
   int get age => _age;
 
   void grow();
+  void provideReward();
   Image get image => images[age];
 
 }

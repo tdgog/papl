@@ -13,9 +13,9 @@
 - [x] switch type system to only accept `int` `float` `bool` `string` `[]` `void` instead of anything
 
 #### game
-- [ ] grid
-- [ ] player
-- [ ] movement
+- [x] grid
+- [x] player
+- [x] movement
 - [ ] gameplay loop
 - [ ] a few resources
 - [ ] a few crops

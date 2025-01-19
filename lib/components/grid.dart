@@ -13,8 +13,8 @@ class GridState extends State<Grid> {
   final double _width = 80;
   late double _yPhysicalPosition;
   late double _xPhysicalPosition;
-  int _yLogicalPosition = 0;
-  int _xLogicalPosition = 0;
+  int y = 0;
+  int x = 0;
 
   GridState() {
     _moveToLogicalPosition();
@@ -22,8 +22,8 @@ class GridState extends State<Grid> {
   }
 
   void _moveToLogicalPosition() {
-    _yPhysicalPosition = 50 - _height / 2 + 110 * _yLogicalPosition;
-    _xPhysicalPosition = 50 - _width / 2 + 110 * _xLogicalPosition;
+    _yPhysicalPosition = 50 - _height / 2 + 110 * y;
+    _xPhysicalPosition = 50 - _width / 2 + 110 * x;
   }
 
   void move(Direction direction) {
@@ -31,33 +31,33 @@ class GridState extends State<Grid> {
       switch(direction) {
         // Move in the logical grid
         case Direction.up:
-          _yLogicalPosition--;
+          y--;
           break;
         case Direction.down:
-          _yLogicalPosition++;
+          y++;
           break;
         case Direction.left:
-          _xLogicalPosition--;
+          x--;
           break;
         case Direction.right:
-          _xLogicalPosition++;
+          x++;
           break;
         case Direction.reset:
-          _xLogicalPosition = 0;
-          _yLogicalPosition = 0;
+          x = 0;
+          y = 0;
           break;
       }
 
       // Prevent out of bounds
-      if (_yLogicalPosition < 0) {
-        _yLogicalPosition = GameData.sizeY - 1;
-      } else if (_yLogicalPosition >= GameData.sizeY) {
-        _yLogicalPosition = 0;
+      if (y < 0) {
+        y = GameData.sizeY - 1;
+      } else if (y >= GameData.sizeY) {
+        y = 0;
       }
-      if (_xLogicalPosition < 0) {
-        _xLogicalPosition = GameData.sizeX - 1;
-      } else if (_xLogicalPosition >= GameData.sizeX) {
-        _xLogicalPosition = 0;
+      if (x < 0) {
+        x = GameData.sizeX - 1;
+      } else if (x >= GameData.sizeX) {
+        x = 0;
       }
 
       // Move in the physical grid
