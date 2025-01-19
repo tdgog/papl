@@ -26,6 +26,6 @@
 - [ ] display how much of each resource an upgrade costs
 - [ ] add information screens for the upgrade tree
 - [ ] make the upgrades actually do something
-- [ ] save to external db
-- [ ] load from external db
+- [x] save to external db
+- [x] load from external db
 

@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:html' as html;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:prototype/components/code_editor.dart';
 import 'package:prototype/components/grid.dart';
 import 'package:prototype/components/upgrade_button.dart';
+import 'package:prototype/data.dart';
 
 GlobalKey<GridState> gridKey = GlobalKey<GridState>();
 GlobalKey<CodeEditorState> editorKey = GlobalKey<CodeEditorState>();
@@ -63,10 +67,50 @@ class _MyHomePageState extends State<MyHomePage> {
                             padding: const EdgeInsets.all(15),
                             child: Row(
                                 children: [
-                                  const Text("Stats here",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                      )
+                                  TextButton(
+                                      onPressed: () {
+                                        var data = {
+                                          "sizeY": GameData.sizeY,
+                                          "sizeX": GameData.sizeX,
+                                          "expressionExecutionTime": GameData.expressionExecutionTime.inMilliseconds,
+                                          "resources": GameData.resources,
+                                          "upgrades": GameData.upgrades,
+                                          "code": editorKey.currentState!.controller.text,
+                                        };
+
+                                        var blob = html.Blob([jsonEncode(data)], 'application/json');
+                                        html.AnchorElement(href: html.Url.createObjectUrlFromBlob(blob))
+                                          ..setAttribute("download", "game_data.json")
+                                          ..click();
+                                      },
+                                      child: const Text("Download Save File",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          )
+                                      ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                        allowedExtensions: ['json'],
+                                        type: FileType.custom,
+                                      );
+                                      if (result != null) {
+                                        String fileContent = String.fromCharCodes(result.files.first.bytes!);
+                                        Map<String, dynamic> data = jsonDecode(fileContent);
+                                        GameData.sizeY = data["sizeY"]!;
+                                        GameData.sizeX = data["sizeX"]!;
+                                        GameData.expressionExecutionTime = Duration(milliseconds: data["expressionExecutionTime"]!);
+                                        GameData.resources = Map.from(data["resources"]!);
+                                        GameData.upgrades = Map.from(data["upgrades"]!);
+                                        editorKey.currentState!.controller.text = data["code"];
+                                      }
+                                    },
+                                    child: const Text("Load Save",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                        )
+                                    ),
                                   ),
                                   const Spacer(),
                                   TextButton(
