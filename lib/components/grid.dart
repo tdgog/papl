@@ -116,8 +116,7 @@ class GridState extends State<Grid> {
               child: Container(
                 width: _width,
                 height: _height,
-                color: Colors.red,
-                child: const Center(child: Text('i am a robot')),
+                child: const Center(child: Image(image: AssetImage('Drone.png'))),
               ),
             ),
           ],
