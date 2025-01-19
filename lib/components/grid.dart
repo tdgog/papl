@@ -18,6 +18,7 @@ class GridState extends State<Grid> {
 
   GridState() {
     _moveToLogicalPosition();
+    grow();
   }
 
   void _moveToLogicalPosition() {
@@ -64,6 +65,19 @@ class GridState extends State<Grid> {
     });
   }
 
+  void grow() async {
+    while (true) {
+      await Future.delayed(GameData.growFrequency);
+      setState(() {
+        for (var row in GameData.grid) {
+          for (var coral in row) {
+            coral.grow();
+          }
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final gridWidth = GameData.sizeX * 100 + (GameData.sizeX - 1) * 10;
@@ -84,10 +98,14 @@ class GridState extends State<Grid> {
               ),
               itemCount: GameData.sizeY * GameData.sizeX,
               itemBuilder: (context, index) {
+                int x = index % GameData.sizeX;
+                int y = index ~/ GameData.sizeX;
                 return Container(
                   height: 100,
                   width: 100,
-                  color: Colors.blue,
+                  child: Center(
+                    child: GameData.grid[y][x].image,
+                  ),
                 );
               },
             ),
