@@ -11,34 +11,56 @@ class Grid extends StatefulWidget {
 class GridState extends State<Grid> {
   final double _height = 50;
   final double _width = 80;
-  late double _yPosition;
-  late double _xPosition;
+  late double _yPhysicalPosition;
+  late double _xPhysicalPosition;
+  int _yLogicalPosition = 0;
+  int _xLogicalPosition = 0;
 
   GridState() {
-    _yPosition = 50 - _height / 2;
-    _xPosition = 50 - _width / 2;
+    _moveToLogicalPosition();
+  }
+
+  void _moveToLogicalPosition() {
+    _yPhysicalPosition = 50 - _height / 2 + 110 * _yLogicalPosition;
+    _xPhysicalPosition = 50 - _width / 2 + 110 * _xLogicalPosition;
   }
 
   void move(Direction direction) {
     setState(() {
-      switch (direction) {
+      switch(direction) {
+        // Move in the logical grid
         case Direction.up:
-          _yPosition -= 20;
+          _yLogicalPosition--;
           break;
         case Direction.down:
-          _yPosition += 20;
+          _yLogicalPosition++;
           break;
         case Direction.left:
-          _xPosition -= 20;
+          _xLogicalPosition--;
           break;
         case Direction.right:
-          _xPosition += 20;
+          _xLogicalPosition++;
           break;
         case Direction.reset:
-          _yPosition = 50 - _height / 2;
-          _xPosition = 50 - _width / 2;
+          _xLogicalPosition = 0;
+          _yLogicalPosition = 0;
           break;
       }
+
+      // Prevent out of bounds
+      if (_yLogicalPosition < 0) {
+        _yLogicalPosition = GameData.sizeY - 1;
+      } else if (_yLogicalPosition >= GameData.sizeY) {
+        _yLogicalPosition = 0;
+      }
+      if (_xLogicalPosition < 0) {
+        _xLogicalPosition = GameData.sizeX - 1;
+      } else if (_xLogicalPosition >= GameData.sizeX) {
+        _xLogicalPosition = 0;
+      }
+
+      // Move in the physical grid
+      _moveToLogicalPosition();
     });
   }
 
@@ -69,9 +91,10 @@ class GridState extends State<Grid> {
                 );
               },
             ),
-            Positioned(
-              left: _xPosition,
-              top: _yPosition,
+            AnimatedPositioned(
+              duration: GameData.expressionExecutionTime,
+              left: _xPhysicalPosition,
+              top: _yPhysicalPosition,
               child: Container(
                 width: _width,
                 height: _height,

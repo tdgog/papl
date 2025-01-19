@@ -80,10 +80,9 @@ class Evaluator {
     return null;
   }
 
+  static int i = 0;
   /// Evaluates the given [BoundExpression] and returns the result
   Future<EvaluationResult> _evaluateExpression(BoundExpression node) async {
-    await Future.delayed(GameData.expressionExecutionTime);
-
     switch (node.kind) {
       case BoundNodeKind.literalExpression:
         return _evaluateLiteralExpression(node as BoundLiteralExpression);
@@ -92,8 +91,10 @@ class Evaluator {
       case BoundNodeKind.unaryExpression:
         return await _evaluateUnaryExpression(node as BoundUnaryExpression);
       case BoundNodeKind.binaryExpression:
+        await Future.delayed(GameData.expressionExecutionTime);
         return await _evaluateBinaryExpression(node as BoundBinaryExpression);
       case BoundNodeKind.functionCallExpression:
+        await Future.delayed(GameData.expressionExecutionTime);
         return await _evaluateFunctionCallExpression(node as BoundFunctionCallExpression);
       case BoundNodeKind.emptyExpression:
         return EvaluationResult.empty();
