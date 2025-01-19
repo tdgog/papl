@@ -64,10 +64,10 @@ class StandardLibrary {
       case "red_bubble":
         GameData.grid[y][x] = RedBubbleCoral(x, y);
       case "blue_plate":
-        if (GameData.resources["blueplate_seed"] == null || GameData.resources["blueplate_seed"] == 0) {
+        if (GameData.resources["blue_plate_seed"] == null || GameData.resources["blue_plate_seed"] == 0) {
           return;
         }
-        GameData.resources["blueplate_seed"] = GameData.resources["blueplate_seed"]! - 1;
+        GameData.resources["blue_plate_seed"] = GameData.resources["blue_plate_seed"]! - 1;
         GameData.grid[y][x] = BluePlateCoral(x, y);
       case "green_cactus":
         if (GameData.resources["green_cactus_seed"] == null || GameData.resources["green_cactus_seed"] == 0) {

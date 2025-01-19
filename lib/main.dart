@@ -138,15 +138,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.white,
                           child: Stack(
                               children: [
-                                const UpgradeButton(x: 600, y: 10, price: [[("redbubble_fragment", 3)]], text: "For & While Loops", upgradeId: "loops"),
-                                const UpgradeButton(x: 600, y: 150, price: [[("redbubble_fragment", 10)]], text: "Expand", upgradeId: "expand"),
-                                const UpgradeButton(x: 300, y: 290, price: [[("redbubble_fragment", 50), ("blueplate_fragment", 10)]], text: "Speed Increase", upgradeId: "speed"),
-                                const UpgradeButton(x: 600, y: 290, price: [[("redbubble_fragment", 25)]], text: "Planting", upgradeId: "plant/blueplate"),
-                                const UpgradeButton(x: 900, y: 430, price: [[]], text: "Operators & If Statements", upgradeId: "operators/if"),
-                                const UpgradeButton(x: 750, y: 570, price: [[]], text: "Location", upgradeId: "location"),
-                                const UpgradeButton(x: 1050, y: 570, price: [[]], text: "Variables", upgradeId: "variables"),
-                                const UpgradeButton(x: 750, y: 710, price: [[]], text: "Utilities", upgradeId: "utilities"),
-                                const UpgradeButton(x: 1050, y: 710, price: [[]], text: "Functions", upgradeId: "functions"),
+                                const UpgradeButton(x: 600, y: 10, price: [[("red_bubble_fragment", 3)]], text: "For & While Loops", upgradeId: "loops"),
+                                const UpgradeButton(x: 600, y: 150, price: [[("red_bubble_fragment", 10)], [("red_bubble_fragment", 30)], [("blue_plate_fragment", 10)], [("blue_plate_fragment", 30)], [("green_cactus_fragment", 10)], [("green_cactus_fragment", 30)], [("gray_pillar_fragment", 10)], [("gray_pillar_fragment", 30)]], text: "Expand", upgradeId: "expand"),
+                                const UpgradeButton(x: 300, y: 290, price: [[("red_bubble_fragment", 50), ("blue_plate_fragment", 10)], [("blue_plate_fragment", 50), ("green_cactus_fragment", 10)], [("green_cactus_fragment", 50), ("gray_pillar_fragment", 10)], [("gray_pillar_fragment", 50), ("orange_tube_fragment", 10)], [("orange_tube_fragment", 50), ("orange_tube_fragment", 50)]], text: "Speed Increase", upgradeId: "speed"),
+                                const UpgradeButton(x: 600, y: 290, price: [[("red_bubble_fragment", 25)]], text: "Planting", upgradeId: "plant/blueplate"),
+                                const UpgradeButton(x: 900, y: 430, price: [[("red_bubble_fragment", 25)]], text: "Operators & If Statements", upgradeId: "operators/if"),
+                                const UpgradeButton(x: 750, y: 570, price: [[("red_bubble_fragment", 100), ("orange_tube_seed", 30)]], text: "Location", upgradeId: "location"),
+                                const UpgradeButton(x: 1050, y: 570, price: [[("orange_tube_seed", 30)]], text: "Variables", upgradeId: "variables"),
+                                const UpgradeButton(x: 750, y: 710, price: [[("blue_plate_fragment", 40), ("gray_pillar_fragment", 40)]], text: "Utilities", upgradeId: "utilities"),
+                                const UpgradeButton(x: 1050, y: 710, price: [[("blue_plate_fragment", 40), ("green_cactus_fragment", 40)]], text: "Functions", upgradeId: "functions"),
 
                                 Positioned(
                                   left: 700,

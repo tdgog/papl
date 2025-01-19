@@ -16,6 +16,6 @@ class RedBubbleCoral extends Coral {
 
   @override
   void provideReward() {
-    GameData.resources["redbubble_fragment"] = GameData.resources["redbubble_fragment"]! + 1;
+    GameData.resources["red_bubble_fragment"] = GameData.resources["red_bubble_fragment"]! + 1;
   }
 }

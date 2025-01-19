@@ -21,7 +21,9 @@
 - [x] gameplay loop
 - [x] add more corals and resources
 - [x] an upgrade tree
-- [ ] configure the upgrade tree
+- [x] configure the upgrade tree
+- [ ] display how much of each resource the player has
+- [ ] display how much of each resource an upgrade costs
 - [ ] add information screens for the upgrade tree
 - [ ] make the upgrades actually do something
 - [ ] save to external db

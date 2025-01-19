@@ -31,6 +31,6 @@ class BluePlateCoral extends Coral {
 
   @override
   void provideReward() {
-    GameData.resources["blueplate_fragment"] = GameData.resources["blueplate_fragment"]! + 1;
+    GameData.resources["blue_plate_fragment"] = GameData.resources["blue_plate_fragment"]! + 1;
   }
 }
