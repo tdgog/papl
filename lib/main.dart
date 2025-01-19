@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: EdgeInsets.all(15),
                         child: Center(
                           child: Text(
-                          "Upgrades menu!!",
+                          "Upgrades Menu",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 20
