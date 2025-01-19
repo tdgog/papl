@@ -1,3 +1,5 @@
+import 'package:prototype/main.dart';
+import 'package:prototype/tempus/exceptions/end_run_session_exception.dart';
 import 'package:prototype/tempus/syntax_kind.dart';
 import 'package:prototype/tempus/syntax_token.dart';
 
@@ -7,11 +9,13 @@ class DataType extends SyntaxToken {
 
   DataType.from(SyntaxToken token) : super(SyntaxKind.dataTypeToken, token.position, token.text, token.text) {
     if (token.text == null) {
-      throw Exception('No text for datatype token');
+      editorKey.currentState?.reportError('No datatype specified');
+      throw EndRunSessionException();
     }
     Type? type = nameToType(token.text!);
     if (type == null) {
-      throw Exception('Invalid datatype token');
+      editorKey.currentState?.reportError('Invalid datatype ${token.text}');
+      throw EndRunSessionException();
     }
     this.type = type;
   }
@@ -19,7 +23,8 @@ class DataType extends SyntaxToken {
   DataType(int position, String text) : super(SyntaxKind.dataTypeToken, position, text, text) {
     Type? type = nameToType(text);
     if (type == null) {
-      throw Exception('Invalid datatype token');
+      editorKey.currentState?.reportError('Invalid datatype $text');
+      throw EndRunSessionException();
     }
     this.type = type;
   }

@@ -61,14 +61,32 @@ class StandardLibrary {
     int y = gridKey.currentState!.y;
 
     switch (type) {
-      case "redbubble":
+      case "red_bubble":
         GameData.grid[y][x] = RedBubbleCoral(x, y);
-      case "blueplate":
+      case "blue_plate":
         if (GameData.resources["blueplate_seed"] == null || GameData.resources["blueplate_seed"] == 0) {
           return;
         }
         GameData.resources["blueplate_seed"] = GameData.resources["blueplate_seed"]! - 1;
         GameData.grid[y][x] = BluePlateCoral(x, y);
+      case "green_cactus":
+        if (GameData.resources["green_cactus_seed"] == null || GameData.resources["green_cactus_seed"] == 0) {
+          return;
+        }
+        GameData.resources["green_cactus_seed"] = GameData.resources["green_cactus_seed"]! - 1;
+        GameData.grid[y][x] = GreenCactusCoral(x, y);
+      case "gray_pillar":
+        if (GameData.resources["gray_pillar_seed"] == null || GameData.resources["gray_pillar_seed"] == 0) {
+          return;
+        }
+        GameData.resources["gray_pillar_seed"] = GameData.resources["gray_pillar_seed"]! - 1;
+        GameData.grid[y][x] = GrayPillarCoral(x, y);
+      case "orange_tube":
+        if (GameData.resources["orange_tube_seed"] == null || GameData.resources["orange_tube_seed"] == 0) {
+          return;
+        }
+        GameData.resources["orange_tube_seed"] = GameData.resources["orange_tube_seed"]! - 1;
+        GameData.grid[y][x] = OrangeTubeCoral(x, y);
     }
   }
 

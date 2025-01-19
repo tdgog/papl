@@ -1,8 +1,9 @@
+import 'package:prototype/main.dart';
 import 'package:prototype/tempus/evaluator/evaluator.dart';
 import 'package:prototype/tempus/evaluator/stdlib/stdlib.dart';
+import 'package:prototype/tempus/exceptions/end_run_session_exception.dart';
 import 'package:prototype/tempus/parsing/binding/binder.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_operator.dart';
-import 'package:prototype/tempus/parsing/binding/bound_expression_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_statement.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/variable_collection.dart';
 import 'package:prototype/tempus/parsing/syntax/block_statement_syntax.dart';
@@ -13,7 +14,7 @@ import 'syntax_tree.dart';
 
 bool _isInitialized = false;
 
-Future<List<String>> interpretString(String code) async {
+Future<void> interpretString(String code) async {
   // Some areas need to be initialized the first time the interpreter runs
   if (!_isInitialized) {
     _isInitialized = true;
@@ -28,15 +29,18 @@ Future<List<String>> interpretString(String code) async {
   SyntaxTree tree = SyntaxTree(code);
   tree.printTree();
 
-  List<String> output = await _interpretLines(tree.root.lines);
-  return output;
+  try {
+    await _interpretLines(tree.root.lines);
+  } on EndRunSessionException {
+    // Do nothing, this is just to pull out of the execution loop
+  }
+  editorKey.currentState?.finishRunning();
 }
 
-Future<List<String>> _interpretLines(List<StatementSyntax> lines, {VariableCollection? previous}) async {
+Future<void> _interpretLines(List<StatementSyntax> lines, {VariableCollection? previous}) async {
   VariableCollection variables = VariableCollection.from(previous ?? {});
   Binder binder = Binder(variables);
 
-  List<String> output = [];
   for (StatementSyntax expression in lines) {
     // Handle nested blocks
     if (expression is BlockStatementSyntax && expression.children != null) {
@@ -48,25 +52,18 @@ Future<List<String>> _interpretLines(List<StatementSyntax> lines, {VariableColle
         }
       }
 
-      List<String> nestedOutput = await _interpretLines(statements, previous: variables);
-      output.addAll(nestedOutput);
+      await _interpretLines(statements, previous: variables);
 
       continue;
     }
 
     BoundStatement boundStatement = binder.bindStatement(expression);
     Evaluator evaluator = Evaluator(variables, boundStatement);
-    var result = await evaluator.evaluate();
-
-    if (boundStatement is BoundExpressionStatement) {
-      output.add("$result");
-    }
+    await evaluator.evaluate();
   }
 
   // Promote any existing variables which have been modified at the end of scope execution
   if (previous != null) {
     previous.updateAll((key, _) => variables[key]!);
   }
-
-  return output;
 }

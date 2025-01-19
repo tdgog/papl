@@ -1,3 +1,5 @@
+import 'package:prototype/main.dart';
+import 'package:prototype/tempus/exceptions/end_run_session_exception.dart';
 import 'package:prototype/tempus/parsing/binding/bound_block.dart';
 import 'package:prototype/tempus/parsing/binding/bound_assignment_statement.dart';
 import 'package:prototype/tempus/parsing/binding/bound_binary_expression.dart';
@@ -98,7 +100,8 @@ final class Binder {
       case SyntaxKind.emptyExpression:
         return BoundEmptyExpression();
       default:
-        throw Exception('Unexpected syntax ${syntax.kind}');
+        editorKey.currentState?.reportError('Unexpected syntax ${syntax.kind}');
+        throw EndRunSessionException();
     }
   }
 
@@ -106,7 +109,8 @@ final class Binder {
     Type? type = DataType.getType(syntax.children!.first.kind);
 
     if (type == null) {
-      throw Exception('Unexpected literal type ${syntax.kind}');
+      editorKey.currentState?.reportError('Unexpected literal type ${syntax.kind}');
+      throw EndRunSessionException();
     }
 
     return BoundLiteralExpression.withType(syntax.value ?? 0, type);
@@ -129,7 +133,8 @@ final class Binder {
     BoundUnaryOperator? operator = BoundUnaryOperator.bind(syntax.operatorToken.kind, operand.type);
 
     if (operator == null) {
-      throw Exception('Invalid unary operator ${syntax.operatorToken.kind}');
+      editorKey.currentState?.reportError('Invalid unary operator ${syntax.operatorToken.kind}');
+      throw EndRunSessionException();
     }
 
     return BoundUnaryExpression(operator, operand);
@@ -143,12 +148,14 @@ final class Binder {
     String? name = syntax.identifierToken.text;
 
     if(!_variables.containsVariable(name)) {
-      throw Exception('Variable $name does not exist');
+      editorKey.currentState?.reportError('Variable $name does not exist');
+      throw EndRunSessionException();
     }
 
     Type? type = _variables.getVariableValue(name)?.runtimeType;
     if (type == null) {
-      throw Exception('Variable $name has no type');
+      editorKey.currentState?.reportError('Variable $name has no type');
+      throw EndRunSessionException();
     }
 
     return BoundVariableExpression(VariableSymbol(name!, type));
@@ -157,13 +164,15 @@ final class Binder {
   BoundExpression _bindFunctionCall(FunctionCallExpression syntax) {
     String? name = syntax.name.text;
     if(!_variables.containsVariable(name)) {
-      throw Exception('Function $name does not exist');
+      editorKey.currentState?.reportError('Function $name does not exist');
+      throw EndRunSessionException();
     }
 
     FunctionContainer function = globals.getVariableValue(name) as FunctionContainer;
 
     if (syntax.arguments.length != function.parameters.length) {
-      throw Exception('Function $name requires ${function.parameters.length} arguments');
+      editorKey.currentState?.reportError('Function $name requires ${function.parameters.length} arguments');
+      throw EndRunSessionException();
     }
 
     // Check types using new binder
@@ -172,7 +181,8 @@ final class Binder {
     for (ExpressionSyntax argument in syntax.arguments) {
       BoundExpression boundArgument = binder._bindExpression(argument);
       if (boundArgument.type != function.parameters[arguments.length].type) {
-        throw Exception('Argument type does not match parameter type');
+        editorKey.currentState?.reportError('Argument type does not match parameter type');
+        throw EndRunSessionException();
       }
       arguments.add(boundArgument);
     }
@@ -186,11 +196,14 @@ final class Binder {
     BoundExpression expression = _bindExpression(syntax.expression);
 
     if (name == null) {
-      throw Exception("No name specified");
+      editorKey.currentState?.reportError("No name specified");
+      throw EndRunSessionException();
     } else if (_variables.containsVariable(name)) {
-      throw Exception('Variable $name already exists');
+      editorKey.currentState?.reportError('Variable $name already exists');
+      throw EndRunSessionException();
     } else if (expression.type != type) {
-      throw Exception('Expression type does not match variable type');
+      editorKey.currentState?.reportError('Expression type does not match variable type');
+      throw EndRunSessionException();
     }
 
     _variables[VariableSymbol(name, type!)] = '';
@@ -202,12 +215,12 @@ final class Binder {
     BoundExpression expression = _bindExpression(syntax.expression);
 
     if (!_variables.containsVariable(name)) {
-      throw Exception('Variable $name does not exist');
+      editorKey.currentState?.reportError('Variable $name does not exist');
     }
 
     VariableSymbol variable = _variables.getVariableSymbolFromName(name)!;
     if (variable.type != expression.type) {
-      throw Exception('Expression type does not match variable type');
+      editorKey.currentState?.reportError('Expression type does not match variable type');
     }
 
     return BoundAssignmentStatement(name!, expression);
@@ -218,9 +231,11 @@ final class Binder {
     Type? returnType = DataType.nameToType(syntax.returnType.text ?? '');
 
     if (name == null) {
-      throw Exception("No name specified");
+      editorKey.currentState?.reportError("No name specified");
+      throw EndRunSessionException();
     } else if (_variables.containsVariable(name)) {
-      throw Exception('Variable $name already exists');
+      editorKey.currentState?.reportError('Variable $name already exists');
+      throw EndRunSessionException();
     }
 
     globals[VariableSymbol(name, returnType!)] = '';
@@ -232,7 +247,8 @@ final class Binder {
     Type returnType = DataType.nameToType(syntax.returnType.text ?? '')!;
 
     if (name == null) {
-      throw Exception("No name specified");
+      editorKey.currentState?.reportError("No name specified");
+      throw EndRunSessionException();
     }
 
     VariableSymbol variableSymbol = globals.getVariableSymbolFromName(name) ?? VariableSymbol(name, returnType);

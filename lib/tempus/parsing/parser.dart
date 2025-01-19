@@ -1,3 +1,5 @@
+import 'package:prototype/main.dart';
+import 'package:prototype/tempus/exceptions/end_run_session_exception.dart';
 import 'package:prototype/tempus/parsing/codeanalysis/parameter.dart';
 import 'package:prototype/tempus/parsing/syntax/assignment_expression_syntax.dart';
 import 'package:prototype/tempus/parsing/syntax/binary_expression_syntax.dart';
@@ -106,7 +108,8 @@ class Parser {
           }
           DataType dataType = DataType.from(_nextToken());
           if (dataType.type == Null) {
-            throw Exception("void is invalid for variable declaration");
+            editorKey.currentState?.reportError("void is an invalid type in variable declarations");
+            throw EndRunSessionException();
           }
           return DefinitionStatementSyntax(dataType, _nextToken(), _nextToken(), _parseExpression());
         }
@@ -180,7 +183,8 @@ class Parser {
       } else if (_current.kind == SyntaxKind.openBraceToken) {
         return FunctionDefinitionStatementSyntax(DataType.from(returnType), functionName, openBracket, parameters, closeBracket, _parseScope(isFunction: true));
       }
-      throw Exception("Invalid function declaration");
+      editorKey.currentState?.reportError("Invalid function declaration");
+      throw EndRunSessionException();
     }
 
     ExpressionSyntax _parseFunctionCall() {
@@ -261,12 +265,15 @@ class Parser {
         StatementSyntax statement = _parseStatement();
         if (isFunction) {
           if (statement is FunctionDefinitionStatementSyntax) {
-            throw Exception("Cannot define functions in function scope");
+            editorKey.currentState?.reportError("Cannot define functions in function scope");
+            throw EndRunSessionException();
           } else if (statement is FunctionDeclarationStatementSyntax) {
-            throw Exception("Cannot declare functions in function scope");
+            editorKey.currentState?.reportError("Cannot declare functions in function scope");
+            throw EndRunSessionException();
           }
         } else if (statement is ReturnStatementSyntax) {
-          throw Exception("Cannot return from outside of function.");
+          editorKey.currentState?.reportError("Cannot return from outside of function.");
+          throw EndRunSessionException();
         }
         nestedStatements.add(statement);
       }

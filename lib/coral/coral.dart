@@ -5,6 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:prototype/data.dart';
 part 'red_bubble.dart';
 part 'blue_plate.dart';
+part 'green_cactus.dart';
+part 'gray_pillar.dart';
+part 'orange_tube.dart';
 
 abstract class Coral {
 

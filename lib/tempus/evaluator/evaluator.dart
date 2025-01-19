@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:prototype/data.dart';
+import 'package:prototype/main.dart';
 import 'package:prototype/tempus/evaluator/evaluation_result.dart';
 import 'package:prototype/tempus/evaluator/visitors/addition_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/division_visitor.dart';
@@ -13,6 +14,7 @@ import 'package:prototype/tempus/evaluator/visitors/modulo_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/multiplication_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/subtraction_visitor.dart';
 import 'package:prototype/tempus/evaluator/visitors/visitor.dart';
+import 'package:prototype/tempus/exceptions/end_run_session_exception.dart';
 import 'package:prototype/tempus/exceptions/loop_exceptions.dart';
 import 'package:prototype/tempus/exceptions/return_exception.dart';
 import 'package:prototype/tempus/parsing/binding/bound_block.dart';
@@ -83,6 +85,9 @@ class Evaluator {
   static int i = 0;
   /// Evaluates the given [BoundExpression] and returns the result
   Future<EvaluationResult> _evaluateExpression(BoundExpression node) async {
+    if (GameData.shouldEndCodeRunning) {
+      throw EndRunSessionException();
+    }
     switch (node.kind) {
       case BoundNodeKind.literalExpression:
         return _evaluateLiteralExpression(node as BoundLiteralExpression);
@@ -113,7 +118,8 @@ class Evaluator {
     Object? result = variables.getVariableValue(expression.variable.name);
 
     if (result == null) {
-      throw Exception('Variable ${expression.variable.name} does not exist.');
+      editorKey.currentState?.reportError('Variable ${expression.variable.name} does not exist.');
+      throw EndRunSessionException();
     }
     return EvaluationResult(result, expression.variable.type);
   }
@@ -150,7 +156,8 @@ class Evaluator {
     } on ReturnException catch (e) {
       // If a return statement is hit, return the result unless the return type is void
       if (e.result.result.runtimeType != expression.functionContainer.returnType) {
-        throw Exception('Attempt to return ${DataType.typeToName(e.result.result.runtimeType)} from function ${expression.functionContainer.name} with return type ${DataType.typeToName(expression.functionContainer.returnType)}');
+        editorKey.currentState?.reportError('Attempt to return ${DataType.typeToName(e.result.result.runtimeType)} from function ${expression.functionContainer.name} with return type ${DataType.typeToName(expression.functionContainer.returnType)}');
+        throw EndRunSessionException();
       }
       return e.result;
     }
@@ -200,6 +207,9 @@ class Evaluator {
 
   /// Evaluates a [BoundStatement]
   Future<void> _evaluateStatement(BoundStatement node) async {
+    if (GameData.shouldEndCodeRunning) {
+      throw EndRunSessionException();
+    }
     switch (node.kind) {
       case BoundNodeKind.assignmentStatement:
         return await _evaluateAssignmentStatement(node as BoundAssignmentStatement);
