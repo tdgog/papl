@@ -17,6 +17,12 @@ class StandardLibrary {
     createFunction("count", [String], count, returnType: int);
     createFunction("x", [], () => gridKey.currentState?.x ?? 0, returnType: int);
     createFunction("y", [], () => gridKey.currentState?.y ?? 0, returnType: int);
+    createFunction("sizeX", [], () => GameData.sizeX, returnType: int);
+    createFunction("sizeY", [], () => GameData.sizeY, returnType: int);
+    createFunction("random", [int, int], (int min, int max) => min + Coral.random.nextInt(max - min));
+    createFunction("abs", [int], (int value) => value.abs(), returnType: int);
+    createFunction("min", [int, int], (int a, int b) => a < b ? a : b, returnType: int);
+    createFunction("max", [int, int], (int a, int b) => a > b ? a : b, returnType: int);
   }
 
   static createFunction(String name, List<Type> params, Function handler, { returnType = Null }) {

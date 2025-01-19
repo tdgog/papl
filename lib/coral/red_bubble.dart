@@ -11,7 +11,7 @@ class RedBubbleCoral extends Coral {
 
   @override
   void grow() {
-    if (Coral.random.nextInt(4) == 0) return;
+    if (Coral.random.nextInt(2) == 0) age++;
     age++;
   }
 

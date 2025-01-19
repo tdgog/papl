@@ -16,7 +16,7 @@
 - [x] grid
 - [x] player
 - [x] movement
-- [ ] gameplay loop
+- [x] gameplay loop
 - [ ] a few resources
 - [ ] a few crops
 - [ ] an upgrade tree
